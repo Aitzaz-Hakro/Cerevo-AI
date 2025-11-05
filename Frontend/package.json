@@ -1,5 +1,5 @@
 {
-  "name": "my-v0-project",
+  "name": "Cerevo Ai",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -38,6 +38,8 @@
     "@radix-ui/react-toggle": "1.1.1",
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.78.0",
     "@vercel/analytics": "latest",
     "autoprefixer": "^10.4.20",
     "axios": "latest",
@@ -50,6 +52,7 @@
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
     "next": "^15.5.6",
+    "next-auth": "^5.0.0-beta.30",
     "next-themes": "^0.4.6",
     "ogl": "^1.0.11",
     "react": "^18.2.0",

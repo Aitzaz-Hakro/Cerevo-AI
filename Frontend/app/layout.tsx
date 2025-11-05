@@ -17,7 +17,7 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: "Cerevo - AI-Powered Career Guidance",
+  title: "Cerevo | AI-Powered Career Guidance",
   description: "Get AI-powered career guidance, resume analysis, and job recommendations",
   keywords: ["Cerevo", "AI Career Guidance", "Resume Analysis", "Job Recommendations"],
   icons: {
@@ -34,10 +34,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.className} font-sans antialiased relative`}>
+      <body className={`${poppins.className} font-sans antialiased relative flex flex-col min-h-screen`}>
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
           <LightRaysBg
-            raysOrigin="top-center"
+            raysOrigin="left"
             raysColor="#2dd4bf"
             raysSpeed={1.2}
             lightSpread={1.5}
@@ -52,7 +52,9 @@ export default function RootLayout({
           />
         </div>
         <Header />
-        {children}
+        <main className="flex-1">
+          {children}
+        </main>
         <Footer />
         <Analytics />
       </body>

@@ -1,11 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import DashboardNav from "@/components/DashboardNav"
 import { FileText, Briefcase, Target, BarChart3, Zap, BookOpen, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { useEffect, useState } from "react"
+import { createClient } from "@/utils/supabase/client"
+import { signout } from "@/lib/auth-actions"
 
 const tools = [
   {
@@ -28,13 +30,6 @@ const tools = [
     title: "Resume Builder",
     description: "Create professional resumes",
     color: "from-green-400 to-green-600",
-  },
-  {
-    href: "/dashboard/resume-categorizer",
-    icon: FileText,
-    title: "Resume Categorizer",
-    description: "Automatically classify your resume",
-    color: "from-teal-400 to-teal-600",
   },
   {
     href: "/dashboard/job-recommendation",
@@ -75,34 +70,52 @@ const tools = [
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const supabase = createClient()
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (!token) {
-      router.push("/login")
-      return
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push("/login")
+      } else {
+        setUser(user)
+      }
+      setLoading(false)
     }
-    setIsLoggedIn(true)
-    const userData = localStorage.getItem("user")
-    if (userData) {
-      setUser(JSON.parse(userData))
-    }
+    checkUser()
   }, [router])
 
-  if (!isLoggedIn) return null
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-muted-foreground">Loading your dashboard...</p>
+      </div>
+    )
+  }
+
+  if (!user) return null
+
+  const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || "User"
+  const userEmail = user.email || ""
+  const userImage = user.user_metadata?.avatar_url
 
   return (
     <div className="flex min-h-screen">
       <DashboardNav />
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
-            <h1 className="text-4xl font-bold mb-2">Welcome back, {user?.name || "User"}!</h1>
-            <p className="text-muted-foreground">Choose a tool to get started with your career journey</p>
+          {/* Header Section */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12 flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Welcome back, {userName} </h1>
+              <p className="text-muted-foreground">{userEmail}</p>
+            </div>
+
           </motion.div>
 
+          {/* Tools Grid */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

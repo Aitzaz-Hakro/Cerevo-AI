@@ -3,22 +3,40 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Menu, X, Moon, Sun, LogOut } from "lucide-react"
+import { Menu, X, Moon, Sun, LogOut, User } from "lucide-react"
 import { motion } from "framer-motion"
 import Image from "next/image"
+import { createClient } from "@/utils/supabase/client"
+import { signout } from "@/lib/auth-actions"
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [isDark, setIsDark] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [user, setUser] = useState<any>(null)
   const router = useRouter()
+  const supabase = createClient()
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    setIsLoggedIn(!!token)
+    // Check Supabase auth
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    checkUser()
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    // Theme
     const darkMode = localStorage.getItem("darkMode") === "true"
     setIsDark(darkMode)
     if (darkMode) document.documentElement.classList.add("dark")
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
   const toggleTheme = () => {
@@ -32,12 +50,12 @@ export default function Header() {
     }
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
-    setIsLoggedIn(false)
-    router.push("/")
+  const handleLogout = async () => {
+    await signout()
   }
+
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || "User"
+  const userAvatar = user?.user_metadata?.avatar_url || "https://www.pngmart.com/files/23/Profile-PNG-Photo.png"
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
@@ -48,8 +66,8 @@ export default function Header() {
                  </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-8">
-          {isLoggedIn ? (
+        <div className="hidden md:flex items-center gap-6">
+          {user ? (
             <>
               <Link href="/dashboard" className="text-sm hover:text-primary transition">
                 Dashboard
@@ -57,13 +75,30 @@ export default function Header() {
               <button onClick={toggleTheme} className="p-2 hover:bg-muted rounded-lg transition">
                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
               </button>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2  rounded-lg hover:opacity-90 transition"
-              >
-                <LogOut size={18} />
-                Logout
-              </button>
+              <div className="flex items-center gap-3 pl-4 border-l border-border">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-card/50 border border-border/50 rounded-lg">
+                  {userAvatar ? (
+                    <img
+                      src={userAvatar}
+                      alt={userName}
+                      className="w-8 h-8 rounded-full object-cover border-2 border-primary/20"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center">
+                      <User size={16} className="text-white" />
+                    </div>
+                  )}
+                  <span className="text-sm font-medium">{userName}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex cursor-pointer items-center gap-2 px-4 py-2 text-sm border border-border rounded-lg hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition"
+                  title="Logout"
+                >
+                  <LogOut size={16} />
+                  Logout
+                </button>
+              </div>
             </>
           ) : (
             <>
@@ -97,26 +132,61 @@ export default function Header() {
           exit={{ opacity: 0, y: -10 }}
           className="md:hidden bg-card border-b border-border p-4 space-y-3"
         >
-          {isLoggedIn ? (
+          {user ? (
             <>
-              <Link href="/dashboard" className="block text-sm hover:text-primary">
+              <div className="flex items-center gap-2 p-3 bg-card/50 border border-border/50 rounded-lg mb-3">
+                {userAvatar ? (
+                  <img
+                    src={userAvatar}
+                    alt={userName}
+                    className="w-10 h-10 rounded-full object-cover border-2 border-primary/20"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center">
+                    <User size={18} className="text-white" />
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm font-medium">{userName}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+              </div>
+              <Link href="/dashboard" className="block text-sm hover:text-primary py-2">
                 Dashboard
               </Link>
               <button
-                onClick={handleLogout}
-                className="w-full text-left text-sm text-destructive hover:text-destructive/80"
+                onClick={toggleTheme}
+                className="w-full text-left text-sm hover:text-primary py-2 flex items-center gap-2"
               >
+                {isDark ? <Sun size={16} /> : <Moon size={16} />}
+                {isDark ? "Light Mode" : "Dark Mode"}
+              </button>
+              <Link href="handleLogout" >
+              <button
+                onClick={handleLogout}
+                className="w-full text-left text-sm text-destructive hover:text-destructive/80 py-2 flex items-center gap-2"
+              >
+                <LogOut size={16} />
                 Logout
               </button>
+              </Link>
+              
             </>
           ) : (
             <>
-              <Link href="/login" className="block text-sm hover:text-primary">
+              <Link href="/login" className="block text-sm hover:text-primary py-2">
                 Login
               </Link>
-              <Link href="/signup" className="block text-sm hover:text-primary">
+              <Link href="/signup" className="block text-sm hover:text-primary py-2">
                 Sign Up
               </Link>
+              <button
+                onClick={toggleTheme}
+                className="w-full text-left text-sm hover:text-primary py-2 flex items-center gap-2"
+              >
+                {isDark ? <Sun size={16} /> : <Moon size={16} />}
+                {isDark ? "Light Mode" : "Dark Mode"}
+              </button>
             </>
           )}
         </motion.div>
