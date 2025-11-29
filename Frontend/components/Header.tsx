@@ -1,8 +1,6 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Menu, X, Moon, Sun, LogOut, User } from "lucide-react"
 import { motion } from "framer-motion"
 import Image from "next/image"
@@ -13,7 +11,6 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [isDark, setIsDark] = useState(false)
   const [user, setUser] = useState<any>(null)
-  const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
