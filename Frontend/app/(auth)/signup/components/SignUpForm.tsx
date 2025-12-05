@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Mail, Lock, User } from "lucide-react"
 import { signup, signInWithGoogle } from "@/lib/auth-actions"
@@ -9,6 +10,7 @@ import { signup, signInWithGoogle } from "@/lib/auth-actions"
 export function SignUpForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -18,6 +20,8 @@ export function SignUpForm() {
     try {
       const formData = new FormData(e.currentTarget)
       await signup(formData)
+      // Force a full refresh to update auth state in header
+      router.refresh()
     } catch (err: any) {
       console.error("Signup error:", err)
       setError(err?.message || "Signup failed. Please try again.")

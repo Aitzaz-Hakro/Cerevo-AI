@@ -25,7 +25,7 @@ export default function Hero() {
           followMouse={true}
           className="w-full h-full"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#071133]/40 via-transparent to-[#020617]/60 -z-5" />
+        <div className="absolute inset-0  -z-5" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 md:py-15 relative">
@@ -37,14 +37,14 @@ export default function Hero() {
               <span className="block gradient-primary-text">Cerevo Ai</span>
             </h1>
 
-            <p className="mt-6 text-lg text-muted-foreground max-w-2xl">
+            <p className="mt-6 text-lg text-muted-foreground max-w-2xl ">
               Turn your resume into opportunities with AI that understands your career.
               Transform job searches and unlock high-impact decisions with our suite of{" "}
               <strong>AI career tools</strong>.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-4 items-center">
-              <StarBorder className="inline-block" color="#7dd3fc">
+            <div className="mt-8 flex flex-wrap gap-4 items-center ">
+              <StarBorder className="inline-block bg-[# ]">
                 <Link href="/signup" className="inline-flex items-center gap-2">
                   <span>Get Started for Free</span>
                   <ArrowRight size={16} />
@@ -81,8 +81,10 @@ export default function Hero() {
                 {/* Top 4 features quick cards */}
                 <div className="p-3 bg-card/40 border border-border/30 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-teal-400/20 to-blue-500/20 rounded-md flex items-center justify-center">
-                      <svg className="w-5 h-5" />
+                    <div className="w-15 h-10 bg-gradient-to-br from-teal-400/20 to-blue-500/20 rounded-md flex items-center justify-center">
+                      <svg className="w-7 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="stroke-teal-400"/>
+                      </svg>
                     </div>
                     <div>
                       <div className="text-sm font-semibold">Resume Analyzer</div>
@@ -94,8 +96,10 @@ export default function Hero() {
                 {/* second */}
                 <div className="p-3 bg-card/40 border border-border/30 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-teal-400/20 to-blue-500/20 rounded-md flex items-center justify-center">
-                      <svg className="w-5 h-5" />
+                    <div className="w-15 h-10 bg-gradient-to-br from-teal-400/20 to-blue-500/20 rounded-md flex items-center justify-center">
+                        <svg className="w-7 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="stroke-teal-400"/>
+                        </svg>
                     </div>
                     <div>
                       <div className="text-sm font-semibold">ATS Checker</div>
@@ -107,9 +111,11 @@ export default function Hero() {
                 {/* third */}
                 <div className="p-3 bg-card/40 border border-border/30 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-teal-400/20 to-blue-500/20 rounded-md flex items-center justify-center">
-                      <svg className="w-5 h-5" />
-                    </div>
+                    <div className="w-15 h-10 bg-gradient-to-br from-teal-400/20 to-blue-500/20 rounded-md flex items-center justify-center">
+                        <svg className="w-7 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="stroke-teal-400"/>
+                        </svg>
+                      </div>
                     <div>
                       <div className="text-sm font-semibold">Resume Builder</div>
                       <div className="text-xs text-muted-foreground leading-snug">Create recruiter-ready resumes</div>
@@ -120,8 +126,10 @@ export default function Hero() {
                 {/* fourth */}
                 <div className="p-3 bg-card/40 border border-border/30 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-teal-400/20 to-blue-500/20 rounded-md flex items-center justify-center">
-                      <svg className="w-5 h-5" />
+                    <div className="w-15 h-10 bg-gradient-to-br from-teal-400/20 to-blue-500/20 rounded-md flex items-center justify-center">
+                        <svg className="w-7 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="stroke-teal-400"/>
+                        </svg>
                     </div>
                     <div>
                       <div className="text-sm font-semibold">Job Recommendations</div>

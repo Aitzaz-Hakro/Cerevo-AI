@@ -8,13 +8,13 @@ const StarBorder = ({
   className = "",
   color = "#7dd3fc",
   speed = "6s",
-  thickness = 2,
+  thickness = 1,
   children,
   ...rest
 }: any) => {
   return (
     <Component
-      className={`relative inline-block overflow-hidden rounded-[20px] ${className}`}
+      className={`relative inline-block overflow-hidden rounded-[50px] ${className}`}
       style={{ padding: `${thickness}px 0`, ...rest.style }}
       {...rest}
     >

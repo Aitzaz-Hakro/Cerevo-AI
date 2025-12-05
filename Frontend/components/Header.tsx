@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { Menu, X, Moon, Sun, LogOut, User } from "lucide-react"
 import { motion } from "framer-motion"
@@ -11,7 +11,9 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [isDark, setIsDark] = useState(false)
   const [user, setUser] = useState<any>(null)
-  const supabase = createClient()
+  
+  // Create supabase client only once
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     // Check Supabase auth
@@ -22,7 +24,8 @@ export default function Header() {
     checkUser()
 
     // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, session?.user?.email)
       setUser(session?.user ?? null)
     })
 
@@ -34,7 +37,7 @@ export default function Header() {
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [supabase])
 
   const toggleTheme = () => {
     const newDark = !isDark
@@ -48,6 +51,8 @@ export default function Header() {
   }
 
   const handleLogout = async () => {
+    // Clear user state immediately for instant UI feedback
+    setUser(null)
     await signout()
   }
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Mail, Lock, Chrome , Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -14,6 +15,7 @@ export function LoginForm() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -26,6 +28,8 @@ export function LoginForm() {
       formData.append("password", password)
 
       await login(formData)
+      // Force a full refresh to update auth state in header
+      router.refresh()
     } catch (err) {
       console.error(err)
       setError("Login failed. Please try again.")
