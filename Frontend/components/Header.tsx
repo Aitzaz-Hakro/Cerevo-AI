@@ -1,11 +1,20 @@
 "use client"
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { Menu, X, Moon, Sun, LogOut, User } from "lucide-react"
-import { motion } from "framer-motion"
+import { Menu, X, Moon, Sun, LogOut, User, FileText, Shield, Target, Brain, TrendingUp, ChevronDown } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import { createClient } from "@/utils/supabase/client"
 import { signout } from "@/lib/auth-actions"
+
+// Navigation links
+const navLinks = [
+  { href: "/resume-analyzer", label: "Resume Analyzer", icon: FileText },
+  { href: "/ats-checker", label: "ATS Checker", icon: Shield },
+  { href: "/job-matcher", label: "Job Matcher", icon: Target },
+  { href: "/mcq-generator", label: "MCQ Generator", icon: Brain },
+  { href: "/skill-gap", label: "Skill Gap", icon: TrendingUp },
+]
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
@@ -59,6 +68,8 @@ export default function Header() {
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || "User"
   const userAvatar = user?.user_metadata?.avatar_url || "https://www.pngmart.com/files/23/Profile-PNG-Photo.png"
 
+  const [servicesOpen, setServicesOpen] = useState(false)
+
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
@@ -69,6 +80,43 @@ export default function Header() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-6">
+          {/* Services Dropdown */}
+          <div 
+            className="relative"
+            onMouseEnter={() => setServicesOpen(true)}
+            onMouseLeave={() => setServicesOpen(false)}
+          >
+            <button 
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition"
+            >
+              Services
+              <ChevronDown size={14} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            <AnimatePresence>
+              {servicesOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute top-full left-0 mt-2 w-56 bg-card border border-border rounded-xl shadow-lg overflow-hidden"
+                >
+                  {navLinks.map((link, index) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted/50 transition"
+                    >
+                      <link.icon size={16} />
+                      {link.label}
+                    </Link>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           {user ? (
             <>
               <Link href="/dashboard" className="text-sm hover:text-primary transition">
@@ -134,6 +182,21 @@ export default function Header() {
           exit={{ opacity: 0, y: -10 }}
           className="md:hidden bg-card border-b border-border p-4 space-y-3"
         >
+          {/* Navigation Links - Always visible on mobile */}
+          <div className="pb-3 mb-3 border-b border-border/50">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 text-sm hover:text-primary py-2"
+              >
+                <link.icon size={16} />
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
           {user ? (
             <>
               <div className="flex items-center gap-2 p-3 bg-card/50 border border-border/50 rounded-lg mb-3">
@@ -153,7 +216,7 @@ export default function Header() {
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </div>
               </div>
-              <Link href="/dashboard" className="block text-sm hover:text-primary py-2">
+              <Link href="/dashboard" onClick={() => setIsOpen(false)} className="block text-sm hover:text-primary py-2">
                 Dashboard
               </Link>
               <button

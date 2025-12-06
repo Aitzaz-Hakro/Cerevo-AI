@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { 
   CheckCircle, 
@@ -15,7 +15,7 @@ import {
 import Link from "next/link";
 
 const steps = [
-  {
+  {  
     number: "01",
     title: "Upload Your Resume",
     description: "Drop your existing resume or create one from scratch using our AI-powered builder.",
@@ -63,14 +63,27 @@ const steps = [
 
 export default function About() {
   const ref = React.useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
 
-  // Horizontal scroll transformation
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-75%"]);
+  // Adjust horizontal scroll based on screen size
+  // Mobile needs more scroll range to show all cards fully
+  const x = useTransform(
+    scrollYProgress, 
+    [0, 1], 
+    ["0%", isMobile ? "-82%" : "-70%"]
+  );
 
   // Individual card transformations based on scroll
   const rotate1 = useTransform(scrollYProgress, [0, 0.2], [5, 0]);
@@ -97,13 +110,13 @@ export default function About() {
   ];
 
   return (
-    <section ref={ref} className="relative h-[400vh]">
+    <section ref={ref} className="relative h-[450vh] md:h-[400vh]">
       {/* Sticky container */}
       <div className="sticky top-0 h-screen overflow-hidden flex items-center">
         {/* Horizontal Scroll Container */}
         <motion.div
           style={{ x }}
-          className="flex h-full items-center gap-8 lg:gap-12 px-6 lg:px-16"
+          className="flex h-full items-center gap-6 sm:gap-8 lg:gap-12 px-4 sm:px-6 lg:px-16"
         >
           {/* INTRO CARD */}
           <motion.div 
@@ -235,7 +248,7 @@ export default function About() {
           {/* CTA CARD */}
           <motion.div
             style={{ opacity: opacityCTA }}
-            className="w-[85vw] sm:w-[70vw] lg:w-[450px] shrink-0 mr-20"
+            className="w-[85vw] sm:w-[70vw] lg:w-[450px] shrink-0 mr-8 sm:mr-16 lg:mr-20"
           >
             <div className="
               relative overflow-hidden
