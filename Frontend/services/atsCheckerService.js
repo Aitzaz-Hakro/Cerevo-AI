@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1/resume";
+const API_BASE_URL = "https://ats-score-dl9t.vercel.app";
+const API_BASE_URL2 = "http://127.0.0.1:8000/api/v1/resume";
 
 /**
  * Upload resume to ATS Checker backend

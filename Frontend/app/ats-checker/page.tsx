@@ -16,15 +16,66 @@ import {
   ArrowRight,
   Shield,
   Target,
-  Award
+  Award,
+  ChevronDown,
+  FileSearch,
+  Hash,
+  RotateCcw,
+  SpellCheck,
+  List,
+  User,
+  Settings,
+  FileType,
+  Layout,
+  Mail,
+  Link as LinkIcon,
+  Crosshair,
+  Wrench,
+  Heart,
+  Pen,
+  Briefcase
 } from "lucide-react";
 import Link from "next/link";
 
+interface CriteriaItem {
+  score: number;
+  feedback: string;
+}
+
+interface ATSResponse {
+  overall_score: number;
+  criteria: {
+    [key: string]: CriteriaItem;
+  };
+  final_feedback: string;
+}
+
+// Criteria display configuration
+const criteriaConfig: { [key: string]: { label: string; icon: any; description: string } } = {
+  ats_parse_rate: { label: "ATS Parse Rate", icon: FileSearch, description: "How well ATS can read your resume" },
+  quantifying_impact: { label: "Quantifying Impact", icon: Hash, description: "Use of metrics and numbers" },
+  repetition: { label: "Repetition", icon: RotateCcw, description: "Avoiding redundant content" },
+  spelling_grammar: { label: "Spelling & Grammar", icon: SpellCheck, description: "Language accuracy" },
+  essential_sections: { label: "Essential Sections", icon: List, description: "Required resume sections" },
+  contact_information: { label: "Contact Info", icon: User, description: "Contact details completeness" },
+  ats_essentials: { label: "ATS Essentials", icon: Settings, description: "ATS-friendly formatting" },
+  file_format_size: { label: "File Format", icon: FileType, description: "File type and size" },
+  design_layout: { label: "Design & Layout", icon: Layout, description: "Visual structure and hierarchy" },
+  email_address: { label: "Email Address", icon: Mail, description: "Professional email format" },
+  hyperlink_in_header: { label: "Header Hyperlinks", icon: LinkIcon, description: "Link placement in header" },
+  tailoring: { label: "Tailoring", icon: Crosshair, description: "Job-specific customization" },
+  hard_skills: { label: "Hard Skills", icon: Wrench, description: "Technical skills coverage" },
+  soft_skills: { label: "Soft Skills", icon: Heart, description: "Interpersonal skills" },
+  action_verbs: { label: "Action Verbs", icon: Pen, description: "Strong verb usage" },
+  tailored_title: { label: "Job Title", icon: Briefcase, description: "Title alignment" },
+};
+
 export default function ATSCheckerPage() {
   const [file, setFile] = useState<File | null>(null);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<ATSResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expandedCriteria, setExpandedCriteria] = useState<string | null>(null);
 
   const handleCheck = async () => {
     if (!file) return;
@@ -35,8 +86,8 @@ export default function ATSCheckerPage() {
 
     try {
       const response = await checkATSCompatibility(file);
-      if (response.status === "success" && response.ats_report) {
-        setData(response.ats_report);
+      if (response && response.overall_score !== undefined) {
+        setData(response);
       } else {
         setError("Failed to process resume.");
       }
@@ -51,12 +102,19 @@ export default function ATSCheckerPage() {
     setFile(null);
     setData(null);
     setError(null);
+    setExpandedCriteria(null);
   };
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-emerald-500";
     if (score >= 60) return "text-amber-500";
     return "text-red-500";
+  };
+
+  const getScoreBg = (score: number) => {
+    if (score >= 80) return "bg-emerald-500/10 border-emerald-500/20";
+    if (score >= 60) return "bg-amber-500/10 border-amber-500/20";
+    return "bg-red-500/10 border-red-500/20";
   };
 
   const getScoreGradient = (score: number) => {
@@ -71,6 +129,17 @@ export default function ATSCheckerPage() {
     if (score >= 40) return "Needs Work";
     return "Poor";
   };
+
+  const toggleCriteria = (key: string) => {
+    setExpandedCriteria(expandedCriteria === key ? null : key);
+  };
+
+  // Group criteria by score range
+  const groupedCriteria = data?.criteria ? {
+    excellent: Object.entries(data.criteria).filter(([_, v]) => v.score >= 80),
+    good: Object.entries(data.criteria).filter(([_, v]) => v.score >= 60 && v.score < 80),
+    needsWork: Object.entries(data.criteria).filter(([_, v]) => v.score < 60),
+  } : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -310,19 +379,19 @@ export default function ATSCheckerPage() {
                     key="results"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="space-y-6"
+                    className="space-y-4 sm:space-y-6"
                   >
-                    {/* Score Card */}
+                    {/* Overall Score Card */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-card border border-border rounded-2xl p-6 sm:p-8 relative overflow-hidden"
+                      className="bg-card border border-border rounded-2xl p-5 sm:p-8 relative overflow-hidden"
                     >
-                      <div className={`absolute top-0 right-0 w-40 h-40 bg-gradient-to-br ${getScoreGradient(data.overall_score || 0)} rounded-full blur-3xl opacity-20`} />
+                      <div className={`absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-gradient-to-br ${getScoreGradient(data.overall_score)} rounded-full blur-3xl opacity-20`} />
                       
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-6 relative">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8 relative">
                         {/* Score Circle */}
-                        <div className="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto sm:mx-0">
+                        <div className="relative w-28 h-28 sm:w-36 sm:h-36 mx-auto sm:mx-0 flex-shrink-0">
                           <svg className="w-full h-full -rotate-90">
                             <circle
                               cx="50%"
@@ -330,7 +399,7 @@ export default function ATSCheckerPage() {
                               r="45%"
                               fill="none"
                               stroke="currentColor"
-                              strokeWidth="8"
+                              strokeWidth="6"
                               className="text-muted/20"
                             />
                             <circle
@@ -339,9 +408,9 @@ export default function ATSCheckerPage() {
                               r="45%"
                               fill="none"
                               stroke="url(#scoreGradient)"
-                              strokeWidth="8"
+                              strokeWidth="6"
                               strokeLinecap="round"
-                              strokeDasharray={`${(data.overall_score || 75) * 2.83} 283`}
+                              strokeDasharray={`${data.overall_score * 2.83} 283`}
                             />
                             <defs>
                               <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -351,125 +420,152 @@ export default function ATSCheckerPage() {
                             </defs>
                           </svg>
                           <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className={`text-4xl sm:text-5xl font-bold ${getScoreColor(data.overall_score)}`}>
+                            <span className={`text-3xl sm:text-4xl font-bold ${getScoreColor(data.overall_score)}`}>
                               {data.overall_score}
                             </span>
-                            <span className="text-sm text-muted-foreground">/ 100</span>
+                            <span className="text-xs text-muted-foreground">/ 100</span>
                           </div>
                         </div>
                         
                         <div className="flex-1 text-center sm:text-left">
-                          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium mb-3 bg-gradient-to-r ${getScoreGradient(data.overall_score || 0)} text-white`}>
+                          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs sm:text-sm font-medium mb-2 bg-gradient-to-r ${getScoreGradient(data.overall_score)} text-white`}>
                             <TrendingUp size={14} />
-                            {getScoreLabel(data.overall_score || 0)}
+                            {getScoreLabel(data.overall_score)}
                           </div>
-                          <h2 className="text-xl sm:text-2xl font-bold mb-2">ATS Compatibility Score</h2>
-                          <p className="text-sm text-muted-foreground mb-1">
-                            <span className="font-medium">Resume:</span> {data.resume_name || "Your Resume"}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            <span className="font-medium">Readability:</span> {data.readability_score || "N/A"}
+                          <h2 className="text-lg sm:text-xl font-bold mb-1">ATS Compatibility Score</h2>
+                          <p className="text-xs sm:text-sm text-muted-foreground">
+                            Based on {Object.keys(data.criteria).length} evaluation criteria
                           </p>
                         </div>
                       </div>
                     </motion.div>
 
-                    {/* Strengths */}
-                    {data.strengths && data.strengths.length > 0 && (
+                    {/* Quick Stats */}
+                    {groupedCriteria && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="bg-card border border-border rounded-2xl p-5 sm:p-6"
+                        transition={{ delay: 0.05 }}
+                        className="grid grid-cols-3 gap-2 sm:gap-4"
                       >
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="p-2 rounded-xl bg-emerald-500/10">
-                            <CheckCircle className="text-emerald-500" size={20} />
-                          </div>
-                          <h3 className="font-semibold text-lg">Strengths</h3>
-                          <span className="ml-auto text-xs bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded-full">
-                            {data.strengths.length} found
-                          </span>
+                        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 sm:p-4 text-center">
+                          <div className="text-xl sm:text-2xl font-bold text-emerald-500">{groupedCriteria.excellent.length}</div>
+                          <div className="text-[10px] sm:text-xs text-muted-foreground">Excellent</div>
                         </div>
-                        <div className="space-y-3">
-                          {data.strengths.map((strength: string, index: number) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.1 + index * 0.05 }}
-                              className="flex gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10"
-                            >
-                              <CheckCircle size={18} className="text-emerald-500 flex-shrink-0 mt-0.5" />
-                              <p className="text-sm text-muted-foreground">{strength}</p>
-                            </motion.div>
-                          ))}
+                        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 sm:p-4 text-center">
+                          <div className="text-xl sm:text-2xl font-bold text-amber-500">{groupedCriteria.good.length}</div>
+                          <div className="text-[10px] sm:text-xs text-muted-foreground">Good</div>
+                        </div>
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 sm:p-4 text-center">
+                          <div className="text-xl sm:text-2xl font-bold text-red-500">{groupedCriteria.needsWork.length}</div>
+                          <div className="text-[10px] sm:text-xs text-muted-foreground">Needs Work</div>
                         </div>
                       </motion.div>
                     )}
 
-                    {/* Weaknesses */}
-                    {data.weaknesses && data.weaknesses.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.15 }}
-                        className="bg-card border border-border rounded-2xl p-5 sm:p-6"
-                      >
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="p-2 rounded-xl bg-red-500/10">
-                            <XCircle className="text-red-500" size={20} />
-                          </div>
-                          <h3 className="font-semibold text-lg">Weaknesses</h3>
-                          <span className="ml-auto text-xs bg-red-500/10 text-red-500 px-2 py-1 rounded-full">
-                            {data.weaknesses.length} found
-                          </span>
-                        </div>
-                        <div className="space-y-3">
-                          {data.weaknesses.map((weakness: string, index: number) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.15 + index * 0.05 }}
-                              className="flex gap-3 p-3 rounded-xl bg-red-500/5 border border-red-500/10"
-                            >
-                              <AlertCircle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
-                              <p className="text-sm text-muted-foreground">{weakness}</p>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
+                    {/* Criteria Breakdown */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                      className="bg-card border border-border rounded-2xl overflow-hidden"
+                    >
+                      <div className="p-4 sm:p-5 border-b border-border">
+                        <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
+                          <Target size={18} className="text-amber-500" />
+                          Detailed Breakdown
+                        </h3>
+                      </div>
 
-                    {/* Suggestions */}
-                    {data.suggestions && data.suggestions.length > 0 && (
+                      <div className="divide-y divide-border">
+                        {data.criteria && Object.entries(data.criteria).map(([key, value], index) => {
+                          const config = criteriaConfig[key] || { label: key.replace(/_/g, ' '), icon: CheckCircle, description: '' };
+                          const Icon = config.icon;
+                          const isExpanded = expandedCriteria === key;
+                          
+                          return (
+                            <motion.div
+                              key={key}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.1 + index * 0.02 }}
+                            >
+                              <button
+                                onClick={() => toggleCriteria(key)}
+                                className="w-full p-3 sm:p-4 flex items-center gap-3 hover:bg-muted/30 transition-colors text-left"
+                              >
+                                {/* Icon */}
+                                <div className={`p-2 rounded-lg flex-shrink-0 ${getScoreBg(value.score)}`}>
+                                  <Icon size={16} className={getScoreColor(value.score)} />
+                                </div>
+                                
+                                {/* Label & Score */}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="font-medium text-sm sm:text-base truncate">{config.label}</span>
+                                    <span className={`font-bold text-sm sm:text-base ${getScoreColor(value.score)}`}>
+                                      {value.score}
+                                    </span>
+                                  </div>
+                                  {/* Progress Bar */}
+                                  <div className="mt-1.5 h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                                    <motion.div
+                                      initial={{ width: 0 }}
+                                      animate={{ width: `${value.score}%` }}
+                                      transition={{ duration: 0.5, delay: 0.2 + index * 0.02 }}
+                                      className={`h-full rounded-full bg-gradient-to-r ${getScoreGradient(value.score)}`}
+                                    />
+                                  </div>
+                                </div>
+                                
+                                {/* Expand Icon */}
+                                <ChevronDown 
+                                  size={18} 
+                                  className={`text-muted-foreground flex-shrink-0 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                                />
+                              </button>
+                              
+                              {/* Expanded Feedback */}
+                              <AnimatePresence>
+                                {isExpanded && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className={`mx-3 sm:mx-4 mb-3 sm:mb-4 p-3 sm:p-4 rounded-xl ${getScoreBg(value.score)}`}>
+                                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                                        {value.feedback}
+                                      </p>
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+
+                    {/* Final Feedback */}
+                    {data.final_feedback && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="bg-card border border-border rounded-2xl p-5 sm:p-6"
+                        className="bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-red-500/10 border border-amber-500/20 rounded-2xl p-5 sm:p-6"
                       >
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="p-2 rounded-xl bg-amber-500/10">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="p-2 rounded-xl bg-amber-500/20 flex-shrink-0">
                             <Sparkles className="text-amber-500" size={20} />
                           </div>
-                          <h3 className="font-semibold text-lg">Suggestions</h3>
+                          <h3 className="font-semibold text-base sm:text-lg pt-1">Summary & Recommendations</h3>
                         </div>
-                        <div className="space-y-3">
-                          {data.suggestions.map((suggestion: string, index: number) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.2 + index * 0.05 }}
-                              className="flex gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10"
-                            >
-                              <Sparkles size={18} className="text-amber-500 flex-shrink-0 mt-0.5" />
-                              <p className="text-sm text-muted-foreground">{suggestion}</p>
-                            </motion.div>
-                          ))}
-                        </div>
+                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                          {data.final_feedback}
+                        </p>
                       </motion.div>
                     )}
 
@@ -478,25 +574,25 @@ export default function ATSCheckerPage() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.25 }}
-                      className="bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-red-500/10 border border-amber-500/20 rounded-2xl p-6 sm:p-8"
+                      className="bg-card border border-border rounded-2xl p-5 sm:p-6"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div className="flex-1">
-                          <h3 className="text-lg sm:text-xl font-bold mb-2">
+                          <h3 className="text-base sm:text-lg font-bold mb-1">
                             Want to improve your score?
                           </h3>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs sm:text-sm text-muted-foreground">
                             Get personalized recommendations and AI-powered resume optimization.
                           </p>
                         </div>
                         <Link
                           href="/signup"
-                          className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl
-                          bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold
+                          className="flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl
+                          bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold text-sm
                           hover:shadow-lg hover:shadow-amber-500/25 transition-all shrink-0"
                         >
                           Sign Up Free
-                          <ArrowRight size={18} />
+                          <ArrowRight size={16} />
                         </Link>
                       </div>
                     </motion.div>
