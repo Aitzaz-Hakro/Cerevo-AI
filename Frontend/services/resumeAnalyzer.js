@@ -25,7 +25,7 @@ export async function analyzeResume(file) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch("http://127.0.0.1:8000/api/v1/resume/analyze", {
+  const response = await fetch("https://web-production-3d3ea7.up.railway.app/analyze_resume", {
     method: "POST",
     body: formData
   });

@@ -8,8 +8,8 @@ interface UseApiOptions {
   onError?: (error: any) => void
 }
 
-export function useApi(options?: UseApiOptions) {
-  const [data, setData] = useState<any>(null)
+export function useApi<T = any>(options?: UseApiOptions) {
+  const [data, setData] = useState<T | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,6 +35,6 @@ export function useApi(options?: UseApiOptions) {
   )
 
   //return { data, loading, error, request }
-  return { data, loading, error, request, setData }
+  return { data, loading, error, request, setData, setError, setLoading }
 
 }

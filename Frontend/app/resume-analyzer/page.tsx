@@ -9,78 +9,82 @@ import {
   FileText, 
   Rocket, 
   AlertCircle, 
-  User, 
-  Mail, 
-  Phone, 
-  Code, 
-  GraduationCap, 
-  Briefcase, 
-  FolderKanban,
-  Trophy,
-  Award,
-  ChevronRight,
+  CheckCircle,
   Sparkles,
   RefreshCw,
-  CheckCircle,
-  ArrowRight
+  ArrowRight,
+  TrendingUp,
+  Target,
+  MessageSquare
 } from "lucide-react";
 import Link from "next/link";
 
+// Type for criteria items
+interface CriteriaItem {
+  score: number;
+  feedback: string;
+}
+
+// Type for API response
+interface AnalysisResult {
+  overall_score: number;
+  criteria: Record<string, CriteriaItem>;
+  final_feedback: string;
+}
+
+// Helper to format criteria names
+const formatCriteriaName = (key: string): string => {
+  return key
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+// Get score color
+const getScoreColor = (score: number): string => {
+  if (score >= 80) return "text-green-500";
+  if (score >= 60) return "text-yellow-500";
+  if (score >= 40) return "text-orange-500";
+  return "text-red-500";
+};
+
+// Get score background
+const getScoreBg = (score: number): string => {
+  if (score >= 80) return "bg-green-500/10 border-green-500/20";
+  if (score >= 60) return "bg-yellow-500/10 border-yellow-500/20";
+  if (score >= 40) return "bg-orange-500/10 border-orange-500/20";
+  return "bg-red-500/10 border-red-500/20";
+};
+
+// Get progress bar color
+const getProgressColor = (score: number): string => {
+  if (score >= 80) return "from-green-500 to-emerald-500";
+  if (score >= 60) return "from-yellow-500 to-amber-500";
+  if (score >= 40) return "from-orange-500 to-amber-500";
+  return "from-red-500 to-rose-500";
+};
+
 export default function ResumeAnalyzerPage() {
   const [file, setFile] = useState<File | null>(null);
-  const { data, loading, error, setData } = useApi();
+  const { data, loading, error, setData, setError } = useApi<AnalysisResult>();
 
   const handleAnalyze = async () => {
     if (!file) return;
 
     try {
+      setError(null);
       const response = await analyzeResume(file);
-      setData(response.data);
-    } catch (err) {
+      setData(response); // API returns data directly, not wrapped
+    } catch (err: unknown) {
       console.error("Error analyzing resume:", err);
+      setError(err instanceof Error ? err.message : "Failed to analyze resume");
     }
   };
 
   const handleReset = () => {
     setFile(null);
     setData(null);
-  };
-
-  // Filter out noise from skills
-  const cleanSkills = (skills: string[] | undefined) => {
-    if (!skills) return [];
-    const techKeywords = ['javascript', 'typescript', 'react', 'next.js', 'nextjs', 'node', 'python', 'java', 'html', 'css', 'tailwind', 'bootstrap', 'git', 'sql', 'mysql', 'postgresql', 'mongodb', 'php', 'supabase', 'prisma', 'nextauth', 'shadcn', 'firebase', 'aws', 'docker', 'kubernetes', 'graphql', 'rest', 'api', 'figma', 'photoshop', 'illustrator'];
-    const softKeywords = ['communication', 'problem solving', 'time management', 'leadership', 'teamwork', 'project management', 'public speaking', 'critical thinking'];
-    
-    return skills
-      .map(s => s.replace(/\n/g, ' ').trim())
-      .filter(s => {
-        const lower = s.toLowerCase();
-        return (
-          techKeywords.some(k => lower.includes(k)) ||
-          softKeywords.some(k => lower.includes(k)) ||
-          (s.length < 30 && !s.includes('•') && !s.includes(':'))
-        );
-      })
-      .map(s => {
-        for (const keyword of [...techKeywords, ...softKeywords]) {
-          if (s.toLowerCase().includes(keyword)) {
-            return keyword.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-          }
-        }
-        return s;
-      })
-      .filter((s, i, arr) => arr.indexOf(s) === i)
-      .slice(0, 15);
-  };
-
-  const cleanEntries = (entries: string[] | undefined) => {
-    if (!entries) return [];
-    return entries
-      .map(e => e.replace(/\n/g, ' ').trim())
-      .filter(e => e.length > 20 && (e.includes('•') || e.startsWith('Developed') || e.startsWith('Built') || e.startsWith('Created') || e.startsWith('Led') || e.startsWith('Collaborated') || e.startsWith('Designed') || e.startsWith('Implemented')))
-      .map(e => e.replace(/^•\s*/, ''))
-      .slice(0, 5);
+    setError(null);
   };
 
   return (
@@ -96,7 +100,7 @@ export default function ResumeAnalyzerPage() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
               <Sparkles size={16} className="text-primary" />
-              <span className="text-sm font-medium text-primary">Free AI-Powered Analysis</span>
+              <span className="text-sm font-medium text-primary">AI-Powered Resume Analysis</span>
             </div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
@@ -105,21 +109,21 @@ export default function ResumeAnalyzerPage() {
               </span>
               <br />
               <span className="bg-gradient-to-r from-primary via-cyan-400 to-teal-400 bg-clip-text text-transparent">
-                in Seconds
+                Get Detailed Scores
               </span>
             </h1>
             
             <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Get instant AI-powered insights on your resume. Discover your strengths, 
-              extract skills, and understand how recruiters see your profile.
+              Get comprehensive AI-powered analysis with scores across 16 key criteria. 
+              Understand how recruiters and ATS systems evaluate your resume.
             </p>
 
             {/* Features */}
             <div className="flex flex-wrap justify-center gap-4 mb-12">
               {[
-                { icon: CheckCircle, text: "Instant Analysis" },
-                { icon: Code, text: "Skill Extraction" },
-                { icon: FileText, text: "Section Detection" },
+                { icon: Target, text: "16 Criteria Scoring" },
+                { icon: TrendingUp, text: "ATS Optimization" },
+                { icon: MessageSquare, text: "Detailed Feedback" },
               ].map((feature, i) => (
                 <div key={i} className="flex items-center gap-2 px-4 py-2 bg-card/50 border border-border/50 rounded-full">
                   <feature.icon size={16} className="text-primary" />
@@ -241,7 +245,7 @@ export default function ResumeAnalyzerPage() {
                   <div className="mt-6 p-4 bg-gradient-to-br from-primary/10 to-cyan-500/10 rounded-xl border border-primary/20">
                     <p className="text-sm font-medium mb-2">Want more features?</p>
                     <p className="text-xs text-muted-foreground mb-3">
-                      Sign up for ATS checking, job matching, and skill gap analysis.
+                      Sign up for job matching, skill gap analysis, and more.
                     </p>
                     <Link
                       href="/signup"
@@ -277,7 +281,7 @@ export default function ResumeAnalyzerPage() {
                       </div>
                     </div>
                     <p className="mt-6 text-lg font-medium">Analyzing your resume...</p>
-                    <p className="text-sm text-muted-foreground mt-1">Extracting skills and information</p>
+                    <p className="text-sm text-muted-foreground mt-1">Scoring across 16 criteria</p>
                   </motion.div>
                 )}
 
@@ -318,10 +322,10 @@ export default function ResumeAnalyzerPage() {
                     </div>
                     <h3 className="text-xl font-semibold mb-2">Upload Your Resume</h3>
                     <p className="text-muted-foreground text-center max-w-sm px-4 mb-6">
-                      Drop your resume file and click analyze to get instant AI-powered insights.
+                      Drop your resume file and click analyze to get detailed AI-powered scores and feedback.
                     </p>
                     <div className="flex flex-wrap justify-center gap-3">
-                      {['Skills', 'Experience', 'Education', 'Projects'].map((item) => (
+                      {['ATS Score', 'Grammar', 'Skills', 'Formatting'].map((item) => (
                         <span key={item} className="px-3 py-1.5 bg-muted/50 rounded-full text-xs text-muted-foreground">
                           {item}
                         </span>
@@ -338,137 +342,116 @@ export default function ResumeAnalyzerPage() {
                     animate={{ opacity: 1 }}
                     className="space-y-6"
                   >
-                    {/* Profile Card */}
+                    {/* Overall Score Card */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-gradient-to-br from-card via-card to-card/80 border border-border rounded-2xl p-5 sm:p-6 relative overflow-hidden"
+                      className="bg-gradient-to-br from-card via-card to-card/80 border border-border rounded-2xl p-6 sm:p-8 relative overflow-hidden"
                     >
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-cyan-500/10 rounded-full blur-3xl" />
+                      <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-primary/10 to-cyan-500/10 rounded-full blur-3xl" />
                       
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 relative">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
-                          <User size={32} className="text-white" />
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-6 relative">
+                        <div className={`w-28 h-28 sm:w-32 sm:h-32 rounded-2xl ${getScoreBg(data.overall_score)} border-2 flex flex-col items-center justify-center flex-shrink-0`}>
+                          <span className={`text-4xl sm:text-5xl font-bold ${getScoreColor(data.overall_score)}`}>
+                            {data.overall_score}
+                          </span>
+                          <span className="text-xs text-muted-foreground mt-1">out of 100</span>
                         </div>
                         
-                        <div className="flex-1 min-w-0">
-                          <h2 className="text-xl sm:text-2xl font-bold truncate">
-                            {data.basic_info?.name || "Candidate"}
-                          </h2>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2">
-                            {data.basic_info?.email && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Mail size={14} className="text-primary" />
-                                <span className="truncate">{data.basic_info.email}</span>
-                              </div>
-                            )}
-                            {data.basic_info?.phone && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Phone size={14} className="text-primary" />
-                                <span>{data.basic_info.phone}</span>
-                              </div>
-                            )}
+                        <div className="flex-1">
+                          <h2 className="text-2xl sm:text-3xl font-bold mb-2">Overall Score</h2>
+                          <p className="text-muted-foreground text-sm sm:text-base">
+                            {data.overall_score >= 80 
+                              ? "Excellent! Your resume is well-optimized."
+                              : data.overall_score >= 60 
+                              ? "Good foundation, with room for improvement."
+                              : data.overall_score >= 40
+                              ? "Some areas need attention for better results."
+                              : "Significant improvements needed."}
+                          </p>
+                          
+                          {/* Progress Bar */}
+                          <div className="mt-4 h-3 bg-muted rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${data.overall_score}%` }}
+                              transition={{ duration: 1, ease: "easeOut" }}
+                              className={`h-full bg-gradient-to-r ${getProgressColor(data.overall_score)} rounded-full`}
+                            />
                           </div>
                         </div>
                       </div>
                     </motion.div>
 
-                    {/* Skills */}
-                    {data.sections?.skills && cleanSkills(data.sections.skills).length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="bg-card border border-border rounded-2xl p-5 sm:p-6"
-                      >
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="p-2 rounded-xl bg-blue-500/10">
-                            <Code className="text-blue-500" size={20} />
-                          </div>
-                          <h3 className="font-semibold text-lg">Technical Skills</h3>
-                          <span className="ml-auto text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-                            {cleanSkills(data.sections.skills).length} detected
-                          </span>
+                    {/* Criteria Grid */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                      className="bg-card border border-border rounded-2xl p-5 sm:p-6"
+                    >
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 rounded-xl bg-primary/10">
+                          <Target className="text-primary" size={20} />
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          {cleanSkills(data.sections.skills).map((skill: string, index: number) => (
-                            <motion.span
-                              key={index}
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: index * 0.03 }}
-                              className="px-3 py-1.5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 
-                              text-sm rounded-lg border border-blue-500/20 hover:border-blue-500/40 
-                              hover:bg-blue-500/20 transition-all cursor-default"
-                            >
-                              {skill}
-                            </motion.span>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
+                        <h3 className="font-semibold text-lg">Detailed Criteria Scores</h3>
+                        <span className="ml-auto text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                          {Object.keys(data.criteria).length} criteria
+                        </span>
+                      </div>
+                      
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        {Object.entries(data.criteria).map(([key, item], index) => (
+                          <motion.div
+                            key={key}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 + index * 0.03 }}
+                            className={`p-4 rounded-xl border ${getScoreBg(item.score)} hover:shadow-md transition-all`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-medium text-sm">{formatCriteriaName(key)}</h4>
+                              <span className={`text-lg font-bold ${getScoreColor(item.score)}`}>
+                                {item.score}
+                              </span>
+                            </div>
+                            
+                            {/* Mini Progress Bar */}
+                            <div className="h-1.5 bg-background/50 rounded-full overflow-hidden mb-3">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${item.score}%` }}
+                                transition={{ duration: 0.8, delay: 0.2 + index * 0.03 }}
+                                className={`h-full bg-gradient-to-r ${getProgressColor(item.score)} rounded-full`}
+                              />
+                            </div>
+                            
+                            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
+                              {item.feedback}
+                            </p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
 
-                    {/* Experience */}
-                    {data.sections?.experience && cleanEntries(data.sections.experience).length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.15 }}
-                        className="bg-card border border-border rounded-2xl p-5 sm:p-6"
-                      >
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="p-2 rounded-xl bg-purple-500/10">
-                            <Briefcase className="text-purple-500" size={20} />
-                          </div>
-                          <h3 className="font-semibold text-lg">Work Experience</h3>
+                    {/* Final Feedback */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="bg-card border border-border rounded-2xl p-5 sm:p-6"
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-xl bg-cyan-500/10">
+                          <MessageSquare className="text-cyan-500" size={20} />
                         </div>
-                        <div className="space-y-3">
-                          {cleanEntries(data.sections.experience).map((exp: string, index: number) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.15 + index * 0.05 }}
-                              className="flex gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
-                            >
-                              <ChevronRight size={18} className="text-purple-500 flex-shrink-0 mt-0.5" />
-                              <p className="text-sm text-muted-foreground leading-relaxed">{exp}</p>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* Projects */}
-                    {data.sections?.projects && cleanEntries(data.sections.projects).length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="bg-card border border-border rounded-2xl p-5 sm:p-6"
-                      >
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="p-2 rounded-xl bg-orange-500/10">
-                            <FolderKanban className="text-orange-500" size={20} />
-                          </div>
-                          <h3 className="font-semibold text-lg">Projects</h3>
-                        </div>
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          {cleanEntries(data.sections.projects).map((project: string, index: number) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.2 + index * 0.05 }}
-                              className="p-4 rounded-xl bg-gradient-to-br from-orange-500/5 to-yellow-500/5 
-                              border border-orange-500/10 hover:border-orange-500/30 transition-all"
-                            >
-                              <p className="text-sm text-muted-foreground leading-relaxed">{project}</p>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
+                        <h3 className="font-semibold text-lg">Summary & Recommendations</h3>
+                      </div>
+                      
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {data.final_feedback}
+                      </p>
+                    </motion.div>
 
                     {/* CTA Banner */}
                     <motion.div
@@ -480,10 +463,10 @@ export default function ResumeAnalyzerPage() {
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div className="flex-1">
                           <h3 className="text-lg sm:text-xl font-bold mb-2">
-                            Want to improve your resume?
+                            Want to improve your score?
                           </h3>
                           <p className="text-sm text-muted-foreground">
-                            Get ATS scores, job recommendations, and personalized improvement tips.
+                            Get job recommendations, skill gap analysis, and AI-powered resume building.
                           </p>
                         </div>
                         <Link
