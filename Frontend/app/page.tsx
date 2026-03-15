@@ -57,30 +57,25 @@ export default function Home() {
     <main className="min-h-screen">
       {/* Hero Section */}
       <Hero />
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 gap-10 lg:px-8 pt-10 pb-20 md:py-20 text-center">
-   
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center space-y-20">
         {/* About Section */}
-         <div>
+        <section>
           <About />
-         </div> 
-       
-        {/* Features Grid */}        
-    
-       <div>
-        <Features/>
-       </div> 
+        </section>
+
+        {/* Features Grid */}
+        <section>
+          <Features />
+        </section>
+
         {/* CTA Section */}
-        
-        <div>
-         <CTA/>
-        </div>
-        
-        <div>
-         <Team />
-        </div>
-      
-     
-      
+        <section>
+          <CTA />
+        </section>
+
+        <section>
+          <Team />
+        </section>
       </section>
     </main>
   )

@@ -10,13 +10,13 @@ import { createClient } from "@/utils/supabase/client"
 import { signout } from "@/lib/auth-actions"
 
 const tools = [
-  {
-    href: "/dashboard/resume-analyzer",
-    icon: FileText,
-    title: "Resume Analyzer",
-    description: "Get detailed analysis of your resume",
-    color: "from-blue-400 to-blue-600",
-  },
+  // {
+  //   href: "/dashboard/resume-analyzer",
+  //   icon: FileText,
+  //   title: "Resume Analyzer",
+  //   description: "Get detailed analysis of your resume",
+  //   color: "from-blue-400 to-blue-600",
+  // },
   {
     href: "/dashboard/ats-checker",
     icon: Zap,
@@ -31,13 +31,13 @@ const tools = [
     description: "Create professional resumes",
     color: "from-green-400 to-green-600",
   },
-  {
-    href: "/dashboard/job-recommendation",
-    icon: Briefcase,
-    title: "Job Recommendations",
-    description: "Get personalized job matches",
-    color: "from-purple-400 to-purple-600",
-  },
+  // {
+  //   href: "/dashboard/job-recommendation",
+  //   icon: Briefcase,
+  //   title: "Job Recommendations",
+  //   description: "Get personalized job matches",
+  //   color: "from-purple-400 to-purple-600",
+  // },
   {
     href: "/dashboard/job-matcher",
     icon: Target,
@@ -45,27 +45,27 @@ const tools = [
     description: "Find perfect job matches",
     color: "from-pink-400 to-pink-600",
   },
-  {
-    href: "/dashboard/skill-gap",
-    icon: BarChart3,
-    title: "Skill Gap Analysis",
-    description: "Identify skills to develop",
-    color: "from-indigo-400 to-indigo-600",
-  },
-  {
-    href: "/dashboard/job-market",
-    icon: BarChart3,
-    title: "Job Market Dashboard",
-    description: "Explore market trends",
-    color: "from-cyan-400 to-cyan-600",
-  },
-  {
-    href: "/dashboard/mcq-generator",
-    icon: BookOpen,
-    title: "MCQ Generator",
-    description: "Practice interview questions",
-    color: "from-red-400 to-red-600",
-  },
+  // {
+  //   href: "/dashboard/skill-gap",
+  //   icon: BarChart3,
+  //   title: "Skill Gap Analysis",
+  //   description: "Identify skills to develop",
+  //   color: "from-indigo-400 to-indigo-600",
+  // },
+  // {
+  //   href: "/dashboard/job-market",
+  //   icon: BarChart3,
+  //   title: "Job Market Dashboard",
+  //   description: "Explore market trends",
+  // color: "from-cyan-400 to-cyan-600",
+  // },
+  // {
+  //   href: "/dashboard/mcq-generator",
+  //   icon: BookOpen,
+  //   title: "MCQ Generator",
+  //   description: "Practice interview questions",
+  //   color: "from-red-400 to-red-600",
+  // },
 ]
 
 export default function DashboardPage() {

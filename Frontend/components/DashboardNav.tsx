@@ -7,15 +7,15 @@ import { FileText, Briefcase, Target, BarChart3, Zap, BookOpen, MessageSquare, H
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/dashboard/resume-analyzer", label: "Resume Analyzer", icon: FileText },
+  // { href: "/dashboard/resume-analyzer", label: "Resume Analyzer", icon: FileText },
   { href: "/dashboard/ats-checker", label: "ATS Checker", icon: Zap },
   { href: "/dashboard/resume-builder", label: "Resume Builder", icon: BookOpen },
-  { href: "/dashboard/job-recommendation", label: "Job Recommendations", icon: Briefcase },
+  // { href: "/dashboard/job-recommendation", label: "Job Recommendations", icon: Briefcase },
   { href: "/dashboard/job-matcher", label: "Job Matcher", icon: Target },
-  { href: "/dashboard/skill-gap", label: "Skill Gap", icon: BarChart3 },
-  { href: "/dashboard/job-market", label: "Job Market", icon: BarChart3 },
-  { href: "/dashboard/mcq-generator", label: "MCQ Generator", icon: BookOpen },
-  { href: "/dashboard/chatbot", label: "Chatbot", icon: MessageSquare },
+  // { href: "/dashboard/skill-gap", label: "Skill Gap", icon: BarChart3 },
+  // { href: "/dashboard/job-market", label: "Job Market", icon: BarChart3 },
+  // { href: "/dashboard/mcq-generator", label: "MCQ Generator", icon: BookOpen },
+  // { href: "/dashboard/chatbot", label: "Chatbot", icon: MessageSquare },
 ]
 
 export default function DashboardNav() {

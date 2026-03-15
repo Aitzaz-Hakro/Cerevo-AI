@@ -9,11 +9,11 @@ import { signout } from "@/lib/auth-actions"
 
 // Navigation links
 const navLinks = [
-  { href: "/resume-analyzer", label: "Resume Analyzer", icon: FileText },
+  // { href: "/resume-analyzer", label: "Resume Analyzer", icon: FileText },
   { href: "/ats-checker", label: "ATS Checker", icon: Shield },
   { href: "/job-matcher", label: "Job Matcher", icon: Target },
-  { href: "/mcq-generator", label: "MCQ Generator", icon: Brain },
-  { href: "/skill-gap", label: "Skill Gap", icon: TrendingUp },
+  // { href: "/mcq-generator", label: "MCQ Generator", icon: Brain },
+  // { href: "/skill-gap", label: "Skill Gap", icon: TrendingUp },
 ]
 
 export default function Header() {
@@ -89,7 +89,7 @@ export default function Header() {
             <button 
               className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition"
             >
-              Services
+              Tools
               <ChevronDown size={14} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
             </button>
             
@@ -119,9 +119,9 @@ export default function Header() {
 
           {user ? (
             <>
-              <Link href="/dashboard" className="text-sm hover:text-primary transition">
+              {/* <Link href="/dashboard" className="text-sm hover:text-primary transition">
                 Dashboard
-              </Link>
+              </Link> */}
               <button onClick={toggleTheme} className="p-2 hover:bg-muted rounded-lg transition">
                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
               </button>
