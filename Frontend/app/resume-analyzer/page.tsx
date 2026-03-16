@@ -66,18 +66,32 @@ const getProgressColor = (score: number): string => {
 
 export default function ResumeAnalyzerPage() {
   const [file, setFile] = useState<File | null>(null);
-  const { data, loading, error, setData, setError } = useApi<AnalysisResult>();
+  const { data, loading, error, setData, setError, setLoading } = useApi<AnalysisResult>();
 
   const handleAnalyze = async () => {
     if (!file) return;
 
     try {
+      setLoading(true);
       setError(null);
+      setData(null);
       const response = await analyzeResume(file);
-      setData(response); // API returns data directly, not wrapped
+
+      const normalized = response?.data && typeof response.data === "object" ? response.data : response;
+      if (
+        typeof normalized?.overall_score !== "number" ||
+        typeof normalized?.criteria !== "object" ||
+        typeof normalized?.final_feedback !== "string"
+      ) {
+        throw new Error("The analyzer returned an unexpected response format. Please verify the resume analyzer API endpoint.");
+      }
+
+      setData(normalized as AnalysisResult);
     } catch (err: unknown) {
       console.error("Error analyzing resume:", err);
       setError(err instanceof Error ? err.message : "Failed to analyze resume");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -182,9 +196,10 @@ export default function ResumeAnalyzerPage() {
 
                 <div className="mt-5 space-y-3">
                   <button
+                    type="button"
                     onClick={handleAnalyze}
                     disabled={!file || loading}
-                    className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl
+                    className={` cursor-pointer w-full flex items-center justify-center gap-2 py-3.5 rounded-xl
                     text-white font-semibold transition-all duration-300
                     ${file && !loading
                       ? "bg-gradient-to-r from-primary via-cyan-500 to-teal-500 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02]"

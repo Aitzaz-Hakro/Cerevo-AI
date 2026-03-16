@@ -25,13 +25,29 @@ export async function analyzeResume(file) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch("https://web-production-3d3ea7.up.railway.app/analyze_resume", {
+  const endpoint =
+    process.env.NEXT_PUBLIC_RESUME_ANALYZER_URL ||
+    "https://web-production-3d3ea7.up.railway.app/analyze_resume";
+
+  const response = await fetch(endpoint, {
     method: "POST",
-    body: formData
+    body: formData,
   });
 
   if (!response.ok) {
-    throw new Error("Failed to analyze resume");
+    let details = "";
+    try {
+      const errorBody = await response.json();
+      details = errorBody?.detail || errorBody?.message || "";
+    } catch {
+      details = "";
+    }
+
+    throw new Error(
+      details
+        ? `Failed to analyze resume: ${details}`
+        : `Failed to analyze resume (HTTP ${response.status})`,
+    );
   }
 
   return await response.json();

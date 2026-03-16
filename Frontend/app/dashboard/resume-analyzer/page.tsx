@@ -26,17 +26,23 @@ import {
 
 export default function ResumeAnalyzerPage() {
   const [file, setFile] = useState<File | null>(null);
-  const { data, loading, error, setData } = useApi();
+  const { data, loading, error, setData, setError, setLoading } = useApi();
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const handleAnalyze = async () => {
     if (!file) return;
 
     try {
+      setLoading(true);
+      setError(null);
       const response = await analyzeResume(file);
-      setData(response.data);
-    } catch (err) {
+      const normalized = response?.data && typeof response.data === "object" ? response.data : response;
+      setData(normalized);
+    } catch (err: unknown) {
       console.error("Error analyzing resume:", err);
+      setError(err instanceof Error ? err.message : "Failed to analyze resume");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -196,9 +202,10 @@ export default function ResumeAnalyzerPage() {
               {/* ACTION BUTTONS */}
               <div className="mt-5 space-y-3">
                 <button
+                  type="button"
                   onClick={handleAnalyze}
                   disabled={!file || loading}
-                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl
+                  className={`cursor-pointer w-full flex items-center justify-center gap-2 py-3 rounded-xl
                   text-white font-medium transition-all duration-300
                   ${file && !loading
                     ? "bg-gradient-to-r from-primary to-primary/80 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02]"
@@ -220,6 +227,7 @@ export default function ResumeAnalyzerPage() {
 
                 {data && (
                   <button
+                    type="button"
                     onClick={handleReset}
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
                     border border-border hover:bg-muted transition-all text-sm"
