@@ -100,7 +100,6 @@ export default function ResumeAnalyzerPage() {
     setData(null);
     setError(null);
   };
-
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
