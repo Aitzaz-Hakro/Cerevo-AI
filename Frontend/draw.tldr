@@ -7,25 +7,25 @@
 			"com.tldraw.asset": 1,
 			"com.tldraw.camera": 1,
 			"com.tldraw.document": 2,
-			"com.tldraw.instance": 25,
+			"com.tldraw.instance": 26,
 			"com.tldraw.instance_page_state": 5,
 			"com.tldraw.page": 1,
 			"com.tldraw.instance_presence": 6,
 			"com.tldraw.pointer": 1,
 			"com.tldraw.shape": 4,
 			"com.tldraw.asset.bookmark": 2,
-			"com.tldraw.asset.image": 5,
+			"com.tldraw.asset.image": 6,
 			"com.tldraw.asset.video": 5,
 			"com.tldraw.shape.group": 0,
-			"com.tldraw.shape.text": 3,
+			"com.tldraw.shape.text": 4,
 			"com.tldraw.shape.bookmark": 2,
-			"com.tldraw.shape.draw": 2,
-			"com.tldraw.shape.geo": 10,
-			"com.tldraw.shape.note": 9,
+			"com.tldraw.shape.draw": 4,
+			"com.tldraw.shape.geo": 11,
+			"com.tldraw.shape.note": 10,
 			"com.tldraw.shape.line": 5,
 			"com.tldraw.shape.frame": 1,
-			"com.tldraw.shape.arrow": 7,
-			"com.tldraw.shape.highlight": 1,
+			"com.tldraw.shape.arrow": 8,
+			"com.tldraw.shape.highlight": 3,
 			"com.tldraw.shape.embed": 4,
 			"com.tldraw.shape.image": 5,
 			"com.tldraw.shape.video": 4,
@@ -173,12 +173,12 @@
 			"typeName": "shape"
 		},
 		{
+			"x": 0,
+			"y": 0,
+			"lastActivityTimestamp": 0,
+			"meta": {},
 			"id": "pointer:pointer",
-			"typeName": "pointer",
-			"x": 1067.3105673681296,
-			"y": 178.7555615494912,
-			"lastActivityTimestamp": 1764416619414,
-			"meta": {}
+			"typeName": "pointer"
 		},
 		{
 			"x": 567.8278722633172,
@@ -889,9 +889,9 @@
 			"typeName": "shape"
 		},
 		{
-			"x": -410.0618507278432,
-			"y": -45.10450673029422,
-			"z": 1.2719690108692059,
+			"x": 503.2018540705035,
+			"y": 511.0931791878645,
+			"z": 0.3384195258560564,
 			"meta": {},
 			"id": "camera:page:page",
 			"typeName": "camera"
@@ -928,6 +928,264 @@
 			},
 			"parentId": "shape:lbkeP8Xy2n-ug29o2ANpE",
 			"index": "a5Zdjp6V",
+			"typeName": "shape"
+		},
+		{
+			"x": -938.7803200493647,
+			"y": 37.62489124440572,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:G2DebDGUsdC42QEZymyMX",
+			"type": "text",
+			"props": {
+				"color": "yellow",
+				"size": "m",
+				"w": 1116.4637738150698,
+				"font": "serif",
+				"textAlign": "start",
+				"autoSize": false,
+				"scale": 1,
+				"richText": {
+					"type": "doc",
+					"attrs": {
+						"dir": "auto"
+					},
+					"content": [
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "write me a detailed meta prompt for github copilot, to build a portfolio builder page in my project, the project is build in nextjs(already have known) and the page should be like "
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "a clean interactive fully responsive page portfoliobuilder "
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "start with hero section with guide and start button,  "
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "after hero section "
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "there should be template section with 6 to 10 portfolio template, "
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							}
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "when user clicks start button, fade out animation and with fade in"
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "webpage asks for mulitple inputs (name, role, theme or every necessary input to build a portfolio  for non tech person), there should be progress bar above it to show progress of details "
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							}
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "the input should be asked one by one."
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							}
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "the input will be further forwareded(post) to fastapi and at last, the bulid now button appears, "
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "upon clicking it the api will hit and there should be two windows appears side by side "
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							}
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "left window shows skeleton loading and time by time tips and information untill the portfolio get build "
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "right window shows in-window view portfolio option where the created portfolio is shown and above that tab there should be two buttons: \"export file \" and \"deploy portfolio.\""
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							}
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "make sure its mobile responsive, user interactive, engagging and minimal,"
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							}
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "the theme colors are already there in the project, api handling is already in parallal page(for reference)"
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							}
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "and for design reference visit : https://vo.dev "
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							}
+						}
+					]
+				}
+			},
+			"parentId": "page:page",
+			"index": "b3Kqk3j8V",
 			"typeName": "shape"
 		},
 		{
@@ -1721,12 +1979,12 @@
 			"editingShapeId": null,
 			"croppingShapeId": null,
 			"selectedShapeIds": [
-				"shape:stTBruVBCy6LVs7K5lCx3"
+				"shape:G2DebDGUsdC42QEZymyMX"
 			],
-			"hoveredShapeId": "shape:aZ3IhOXx9X7Pkc99BmzNf",
+			"hoveredShapeId": "shape:lqmk3CbSK1PqVpZsYpA_b",
 			"erasingShapeIds": [],
 			"hintingShapeIds": [],
-			"focusedGroupId": "shape:QdWC2cKCzCDxXFA8Tb_w5",
+			"focusedGroupId": null,
 			"meta": {},
 			"id": "instance_page_state:page:page",
 			"pageId": "page:page",
@@ -3837,13 +4095,8 @@
 			"followingUserId": null,
 			"opacityForNextShape": 1,
 			"stylesForNextShape": {
-				"tldraw:geo": "rectangle",
-				"tldraw:dash": "dotted",
-				"tldraw:size": "s",
-				"tldraw:color": "black",
-				"tldraw:fill": "semi",
 				"tldraw:font": "serif",
-				"tldraw:textAlign": "middle"
+				"tldraw:color": "yellow"
 			},
 			"brush": null,
 			"scribbles": [],
@@ -3858,7 +4111,7 @@
 			"screenBounds": {
 				"x": 0,
 				"y": 0,
-				"w": 1318,
+				"w": 718,
 				"h": 652
 			},
 			"insets": [
@@ -3882,6 +4135,7 @@
 			"isReadonly": false,
 			"meta": {},
 			"duplicateProps": null,
+			"cameraState": "idle",
 			"id": "instance:instance",
 			"currentPageId": "page:page",
 			"typeName": "instance"
