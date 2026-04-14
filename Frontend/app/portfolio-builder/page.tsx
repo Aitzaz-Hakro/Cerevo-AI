@@ -9,13 +9,12 @@ import {
 	Download,
 	ExternalLink,
 	Loader2,
-	Rocket,
 	Sparkles,
 	WandSparkles,
 } from "lucide-react";
 import apiClient from "@/lib/apiClient";
 
-type BuilderStage = "landing" | "form" | "submitted" | "building";
+type BuilderStage = "landing" | "form" | "building";
 
 type TemplateTone = "light" | "dark";
 
@@ -153,6 +152,47 @@ const fadeWrapper = {
 	transition: { duration: 0.35 },
 };
 
+const templatePromptDirection: Record<string, string> = {
+	"neo-minimal": "Keep the layout minimal, airy, and typography-forward.",
+	"product-story": "Organize the content like a product case study with outcomes first.",
+	"studio-grid": "Use a creative grid structure with strong visual hierarchy.",
+	"craft-portfolio": "Keep the tone warm, human, and approachable.",
+	velocity: "Use bold sections and sharp blocks suited for a builder profile.",
+	"founder-kit": "Frame the narrative like a startup founder portfolio with clear CTA.",
+	"mono-showcase": "Use monochrome contrast and editorial spacing for clarity.",
+	"folio-flow": "Use smooth storytelling sections that guide visitors from intro to CTA.",
+};
+
+function promptValue(value: string, fallback: string): string {
+	const normalized = value.trim();
+	return normalized.length > 0 ? normalized : fallback;
+}
+
+function buildPortfolioPrompt(data: PortfolioFormData, template: PortfolioTemplate): string {
+	const userName = promptValue(data.fullName, "not provided");
+	const role = promptValue(data.role, "not provided");
+	const intro = promptValue(data.bio, "not provided");
+	const topSkills = promptValue(data.skills, "not provided");
+	const project = promptValue(data.primaryProject, "not provided");
+	const email = promptValue(data.contactEmail, "not provided");
+	const cta = promptValue(data.callToAction, "Contact Me");
+	const theme = promptValue(data.theme, "clean and modern");
+	const templateIntent =
+		templatePromptDirection[template.id] ||
+		"Keep it clean, readable, and conversion-focused.";
+
+	return [
+		`Create portfolio with my name ${userName} and my designation ${role}.`,
+		`My short intro is ${intro}.`,
+		`My top skills are ${topSkills}.`,
+		`My key project is ${project}.`,
+		`My email is ${email} and my CTA is ${cta}.`,
+		`Use theme preference ${theme}.`,
+		`Use template ${template.name}.`,
+		templateIntent,
+	].join(" ");
+}
+
 function getProgress(currentStep: number): number {
 	return Math.round(((currentStep + 1) / formSteps.length) * 100);
 }
@@ -230,6 +270,17 @@ export default function PortfolioBuilderPage() {
 	const progress = getProgress(stepIndex);
 	const currentStep = formSteps[stepIndex];
 	const canAdvance = formData[currentStep.key].trim().length > 0;
+	const isLastStep = stepIndex === formSteps.length - 1;
+
+	const answeredCount = useMemo(
+		() => Object.values(formData).filter((value) => value.trim().length > 0).length,
+		[formData],
+	);
+
+	const combinedPrompt = useMemo(
+		() => buildPortfolioPrompt(formData, selectedTemplate),
+		[formData, selectedTemplate],
+	);
 
 	const previewMarkup = useMemo(() => {
 		if (buildResponse?.preview_html) {
@@ -264,6 +315,7 @@ export default function PortfolioBuilderPage() {
 
 	const onNextStep = () => {
 		if (!canAdvance) {
+			setError("Add an answer or use Skip for this step.");
 			return;
 		}
 		setError(null);
@@ -275,61 +327,58 @@ export default function PortfolioBuilderPage() {
 		setStepIndex((prev) => Math.max(prev - 1, 0));
 	};
 
-	const submitDetails = async () => {
-		if (!canAdvance) {
-			return;
-		}
-
+	const buildPortfolio = async (dataToBuild: PortfolioFormData = formData) => {
+		setStage("building");
+		setIsBuilding(true);
+		setTipIndex(0);
 		setSubmitting(true);
 		setError(null);
 
 		try {
 			const payload = {
 				template_id: selectedTemplate.id,
-				...formData,
+				template_name: selectedTemplate.name,
+				theme_choice: dataToBuild.theme,
+				prompt: buildPortfolioPrompt(dataToBuild, selectedTemplate),
+				user_inputs: dataToBuild,
+				...dataToBuild,
 			};
 
 			const endpoint =
 				process.env.NEXT_PUBLIC_PORTFOLIO_BUILD_ENDPOINT || "/api/v1/portfolio/build";
 			const response = await apiClient.post<BuildApiResponse>(endpoint, payload);
 			setBuildResponse(response.data);
-			setStage("submitted");
-		} catch (err: unknown) {
-			const message =
-				err instanceof Error ? err.message : "Unable to save details. Please try again.";
-			setError(message);
-		} finally {
-			setSubmitting(false);
-		}
-	};
-
-	const startBuildNow = async () => {
-		setStage("building");
-		setIsBuilding(true);
-		setTipIndex(0);
-		setError(null);
-
-		try {
-			const endpoint =
-				process.env.NEXT_PUBLIC_PORTFOLIO_BUILD_NOW_ENDPOINT ||
-				"/api/v1/portfolio/build-now";
-			const response = await apiClient.post<BuildApiResponse>(endpoint, {
-				template_id: selectedTemplate.id,
-				...formData,
-				build_id: buildResponse?.id,
-			});
-			setBuildResponse((prev) => ({ ...prev, ...response.data }));
 		} catch (err: unknown) {
 			const message =
 				err instanceof Error
 					? err.message
-					: "Build started locally, but backend status could not be fetched.";
+					: "Unable to build the portfolio right now. Please try again.";
 			setError(message);
 		} finally {
-			window.setTimeout(() => {
-				setIsBuilding(false);
-			}, 2600);
+			setSubmitting(false);
+			setIsBuilding(false);
 		}
+	};
+
+	const onSkipStep = () => {
+		const updatedData: PortfolioFormData = {
+			...formData,
+			[currentStep.key]: "",
+		};
+		setFormData(updatedData);
+		setError(null);
+
+		if (isLastStep) {
+			void buildPortfolio(updatedData);
+			return;
+		}
+
+		setStepIndex((prev) => Math.min(prev + 1, formSteps.length - 1));
+	};
+
+	const backToForm = () => {
+		setStage("form");
+		setError(null);
 	};
 
 	const exportPortfolio = () => {
@@ -379,16 +428,16 @@ export default function PortfolioBuilderPage() {
 										Portfolio Builder
 									</div>
 									<h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
-										Launch a polished portfolio without touching code
+										Build a portfolio in one API call
 									</h1>
 									<p className="mx-auto mt-4 max-w-2xl text-sm text-muted-foreground sm:text-base">
-										Choose a template, answer one guided question at a time, and generate a ready-to-share portfolio preview.
+										Choose a template, answer quick guided questions, skip any step if needed, and generate a ready-to-share preview.
 									</p>
 
 									<div className="mx-auto mt-8 grid max-w-xl gap-3 rounded-2xl border border-border/70 bg-background/80 p-4 text-left sm:grid-cols-3">
 										<p className="text-xs text-muted-foreground sm:text-sm">1. Pick template</p>
-										<p className="text-xs text-muted-foreground sm:text-sm">2. Fill guided flow</p>
-										<p className="text-xs text-muted-foreground sm:text-sm">3. Build and export</p>
+										<p className="text-xs text-muted-foreground sm:text-sm">2. Answer or skip</p>
+										<p className="text-xs text-muted-foreground sm:text-sm">3. Build, preview, export</p>
 									</div>
 
 									<button
@@ -405,7 +454,7 @@ export default function PortfolioBuilderPage() {
 								<div className="mb-4 flex items-center justify-between">
 									<h2 className="text-xl font-semibold sm:text-2xl">Portfolio Templates</h2>
 									<p className="text-xs text-muted-foreground sm:text-sm">
-										Select one. You can switch before submit.
+										Select one. You can switch anytime before building.
 									</p>
 								</div>
 
@@ -458,11 +507,13 @@ export default function PortfolioBuilderPage() {
 										<span>
 											Step {stepIndex + 1} of {formSteps.length}
 										</span>
-										<span>{progress}% complete</span>
+										<span>
+											{progress}% complete | {answeredCount}/{formSteps.length} answered
+										</span>
 									</div>
 									<div className="h-2 w-full overflow-hidden rounded-full bg-muted">
 										<motion.div
-											  className="h-full rounded-full bg-linear-to-r from-emerald-500 to-cyan-500"
+											className="h-full rounded-full bg-linear-to-r from-emerald-500 to-cyan-500"
 											initial={{ width: 0 }}
 											animate={{ width: `${progress}%` }}
 											transition={{ duration: 0.35 }}
@@ -470,8 +521,12 @@ export default function PortfolioBuilderPage() {
 									</div>
 								</div>
 
-								<div className="mb-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-xs text-emerald-700 dark:text-emerald-300 sm:text-sm">
+								<div className="mb-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-xs text-emerald-700 dark:text-emerald-300 sm:text-sm">
 									Template selected: <span className="font-semibold">{selectedTemplate.name}</span>
+								</div>
+
+								<div className="mb-6 rounded-2xl border border-border/70 bg-background/70 p-4 text-xs text-muted-foreground sm:text-sm">
+									Any question can be skipped. Skipped fields are still included in the final prompt as "not provided".
 								</div>
 
 								<AnimatePresence mode="wait">
@@ -505,6 +560,13 @@ export default function PortfolioBuilderPage() {
 									</motion.div>
 								</AnimatePresence>
 
+								<div className="mt-6 rounded-2xl border border-border/70 bg-background/70 p-4">
+									<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+										Combined Prompt Preview
+									</p>
+									<p className="mt-2 text-sm leading-relaxed text-muted-foreground">{combinedPrompt}</p>
+								</div>
+
 								{error && (
 									<p className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-300">
 										{error}
@@ -512,35 +574,45 @@ export default function PortfolioBuilderPage() {
 								)}
 
 								<div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-									<button
-										onClick={onPreviousStep}
-										disabled={stepIndex === 0}
-										className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border px-5 text-sm font-medium transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
-									>
-										<ArrowLeft size={15} /> Back
-									</button>
-
-									{stepIndex === formSteps.length - 1 ? (
+									<div className="flex flex-wrap gap-3">
 										<button
-											onClick={submitDetails}
-											disabled={!canAdvance || submitting}
-											  className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-linear-to-r from-emerald-500 to-cyan-500 px-6 text-sm font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+											onClick={onPreviousStep}
+											disabled={stepIndex === 0 || submitting}
+											className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border px-5 text-sm font-medium transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+										>
+											<ArrowLeft size={15} /> Back
+										</button>
+
+										<button
+											onClick={onSkipStep}
+											disabled={submitting}
+											className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border px-5 text-sm font-medium transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+										>
+											Skip Step
+										</button>
+									</div>
+
+									{isLastStep ? (
+										<button
+											onClick={() => void buildPortfolio()}
+											disabled={submitting}
+											className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-linear-to-r from-emerald-500 to-cyan-500 px-6 text-sm font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
 										>
 											{submitting ? (
 												<>
-													<Loader2 size={15} className="animate-spin" /> Submitting...
+													<Loader2 size={15} className="animate-spin" /> Building...
 												</>
 											) : (
 												<>
-													Continue <ArrowRight size={15} />
+													Build Portfolio <WandSparkles size={15} />
 												</>
 											)}
 										</button>
 									) : (
 										<button
 											onClick={onNextStep}
-											disabled={!canAdvance}
-											  className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-linear-to-r from-emerald-500 to-cyan-500 px-6 text-sm font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+											disabled={!canAdvance || submitting}
+											className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-linear-to-r from-emerald-500 to-cyan-500 px-6 text-sm font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
 										>
 											Next <ArrowRight size={15} />
 										</button>
@@ -550,38 +622,24 @@ export default function PortfolioBuilderPage() {
 						</motion.section>
 					)}
 
-					{stage === "submitted" && (
-						<motion.section key="submitted" {...fadeWrapper} className="mx-auto max-w-2xl">
-							<div className="rounded-3xl border border-border/80 bg-card/70 p-6 text-center sm:p-10">
-								<div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-300">
-									<CheckCircle2 size={26} />
-								</div>
-								<h2 className="mt-5 text-2xl font-semibold">Your details are ready</h2>
-								<p className="mt-2 text-sm text-muted-foreground sm:text-base">
-									Everything is submitted. Start the build process to generate your live portfolio preview.
-								</p>
-
-								{error && (
-									<p className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-300">
-										{error}
-									</p>
-								)}
-
-								<button
-									onClick={startBuildNow}
-									  className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-linear-to-r from-emerald-500 to-cyan-500 px-8 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:scale-[1.02]"
-								>
-									<Rocket size={16} /> Build Now
-								</button>
-							</div>
-						</motion.section>
-					)}
-
 					{stage === "building" && (
 						<motion.section key="building" {...fadeWrapper}>
 							<div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card/70 p-4">
-								<h2 className="text-lg font-semibold sm:text-xl">Build & Preview</h2>
+								<div>
+									<h2 className="text-lg font-semibold sm:text-xl">Build & Preview</h2>
+									<p className="mt-1 text-xs text-muted-foreground sm:text-sm">
+										{isBuilding
+											? "Building portfolio from one combined prompt..."
+											: "Build request finished. You can review, export, or edit answers."}
+									</p>
+								</div>
 								<div className="flex flex-wrap items-center gap-2">
+									<button
+										onClick={backToForm}
+										className="inline-flex h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium transition hover:bg-muted"
+									>
+										<ArrowLeft size={15} /> Edit Answers
+									</button>
 									<button
 										onClick={exportPortfolio}
 										className="inline-flex h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium transition hover:bg-muted"
@@ -631,7 +689,9 @@ export default function PortfolioBuilderPage() {
 												exit={{ opacity: 0, y: -6 }}
 												className="mt-2 text-sm"
 											>
-												{buildTips[tipIndex]}
+												{isBuilding
+													? buildTips[tipIndex]
+													: "Build complete. Review your preview and export when ready."}
 											</motion.p>
 										</AnimatePresence>
 										{isBuilding && (
@@ -639,6 +699,13 @@ export default function PortfolioBuilderPage() {
 												<Loader2 size={13} className="animate-spin" /> Building in progress
 											</p>
 										)}
+									</div>
+
+									<div className="mt-4 rounded-xl border border-border/70 bg-background/70 p-4">
+										<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+											Prompt sent to API
+										</p>
+										<p className="mt-2 text-sm leading-relaxed text-muted-foreground">{combinedPrompt}</p>
 									</div>
 								</div>
 

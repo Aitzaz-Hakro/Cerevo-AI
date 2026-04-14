@@ -13,15 +13,16 @@
 			"com.tldraw.instance_presence": 6,
 			"com.tldraw.pointer": 1,
 			"com.tldraw.shape": 4,
-			"com.tldraw.asset.bookmark": 2,
+			"com.tldraw.user": 1,
 			"com.tldraw.asset.image": 6,
 			"com.tldraw.asset.video": 5,
+			"com.tldraw.asset.bookmark": 2,
 			"com.tldraw.shape.group": 0,
 			"com.tldraw.shape.text": 4,
 			"com.tldraw.shape.bookmark": 2,
 			"com.tldraw.shape.draw": 4,
 			"com.tldraw.shape.geo": 11,
-			"com.tldraw.shape.note": 10,
+			"com.tldraw.shape.note": 12,
 			"com.tldraw.shape.line": 5,
 			"com.tldraw.shape.frame": 1,
 			"com.tldraw.shape.arrow": 8,
@@ -889,9 +890,9 @@
 			"typeName": "shape"
 		},
 		{
-			"x": 503.2018540705035,
-			"y": 511.0931791878645,
-			"z": 0.3384195258560564,
+			"x": 1004.6634563415992,
+			"y": 107.69439876216569,
+			"z": 0.5477261234705005,
 			"meta": {},
 			"id": "camera:page:page",
 			"typeName": "camera"
@@ -931,8 +932,8 @@
 			"typeName": "shape"
 		},
 		{
-			"x": -938.7803200493647,
-			"y": 37.62489124440572,
+			"x": -980.7721094025317,
+			"y": 17.541861553760626,
 			"rotation": 0,
 			"isLocked": false,
 			"opacity": 1,
@@ -1981,7 +1982,7 @@
 			"selectedShapeIds": [
 				"shape:G2DebDGUsdC42QEZymyMX"
 			],
-			"hoveredShapeId": "shape:lqmk3CbSK1PqVpZsYpA_b",
+			"hoveredShapeId": "shape:G2DebDGUsdC42QEZymyMX",
 			"erasingShapeIds": [],
 			"hintingShapeIds": [],
 			"focusedGroupId": null,
@@ -4094,10 +4095,7 @@
 		{
 			"followingUserId": null,
 			"opacityForNextShape": 1,
-			"stylesForNextShape": {
-				"tldraw:font": "serif",
-				"tldraw:color": "yellow"
-			},
+			"stylesForNextShape": {},
 			"brush": null,
 			"scribbles": [],
 			"cursor": {
@@ -4111,8 +4109,8 @@
 			"screenBounds": {
 				"x": 0,
 				"y": 0,
-				"w": 718,
-				"h": 652
+				"w": 737,
+				"h": 489
 			},
 			"insets": [
 				false,
@@ -4394,6 +4392,14 @@
 			"parentId": "page:page",
 			"index": "b0GU1QRdG",
 			"typeName": "shape"
+		},
+		{
+			"name": "",
+			"color": "#9D5BD2",
+			"imageUrl": "",
+			"meta": {},
+			"id": "user:4RcW3JTUOsfca-cFsPVdO",
+			"typeName": "user"
 		},
 		{
 			"x": 1255.1871418258852,
