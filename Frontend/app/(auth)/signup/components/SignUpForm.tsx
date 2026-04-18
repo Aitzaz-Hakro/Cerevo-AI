@@ -31,7 +31,7 @@ export function SignUpForm() {
   }
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center px-4">
+    <main className="min-h-screen bg-transparent flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
