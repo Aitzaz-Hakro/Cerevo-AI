@@ -25,6 +25,10 @@ export default function Header() {
   const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
+    if (!supabase) {
+      return
+    }
+
     // Check Supabase auth
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()

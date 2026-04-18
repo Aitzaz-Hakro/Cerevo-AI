@@ -75,6 +75,11 @@ export default function DashboardPage() {
   const supabase = createClient()
 
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false)
+      return
+    }
+
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
@@ -85,7 +90,7 @@ export default function DashboardPage() {
       setLoading(false)
     }
     checkUser()
-  }, [router])
+  }, [router, supabase])
 
   if (loading) {
     return (
