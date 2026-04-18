@@ -49,7 +49,9 @@ type FormStep = {
 
 type BuildApiResponse = {
 	id?: string;
+	session_id?: string;
 	preview_url?: string;
+	download_zip?: string;
 	preview_html?: string;
 	export_url?: string;
 	deploy_url?: string;
@@ -163,6 +165,66 @@ const templatePromptDirection: Record<string, string> = {
 	"folio-flow": "Use smooth storytelling sections that guide visitors from intro to CTA.",
 };
 
+const PORTFOLIO_API_BASE_URL =
+	process.env.NEXT_PUBLIC_PORTFOLIO_API_BASE_URL || "https://web-production-57d28a.up.railway.app";
+const PORTFOLIO_BUILD_TIMEOUT_MS = 120000;
+
+function toAbsoluteUrl(pathOrUrl: string | undefined, baseUrl: string): string | undefined {
+	if (!pathOrUrl) {
+		return undefined;
+	}
+
+	if (/^https?:\/\//i.test(pathOrUrl)) {
+		return pathOrUrl;
+	}
+
+	const normalizedBase = baseUrl.replace(/\/$/, "");
+	const normalizedPath = pathOrUrl.startsWith("/") ? pathOrUrl : `/${pathOrUrl}`;
+	return `${normalizedBase}${normalizedPath}`;
+}
+
+function getApiErrorMessage(error: unknown): string {
+	if (typeof error === "object" && error !== null) {
+		const code = (error as { code?: unknown }).code;
+		if (code === "ECONNABORTED") {
+			return "Portfolio generation is taking longer than expected. Please retry in a moment.";
+		}
+	}
+
+	if (typeof error === "object" && error !== null && "response" in error) {
+		const response = (error as { response?: { data?: unknown; status?: number } }).response;
+		const data = response?.data;
+
+		if (typeof data === "string" && data.trim().length > 0) {
+			return data;
+		}
+
+		if (typeof data === "object" && data !== null) {
+			const detail = (data as { detail?: unknown }).detail;
+			if (typeof detail === "string" && detail.trim().length > 0) {
+				return detail;
+			}
+
+			if (Array.isArray(detail) && detail.length > 0) {
+				const firstError = detail[0] as { msg?: string };
+				if (firstError?.msg) {
+					return firstError.msg;
+				}
+			}
+		}
+
+		if (response?.status) {
+			return `Request failed with status ${response.status}.`;
+		}
+	}
+
+	if (error instanceof Error && error.message.trim().length > 0) {
+		return error.message;
+	}
+
+	return "Unable to build the portfolio right now. Please try again.";
+}
+
 function promptValue(value: string, fallback: string): string {
 	const normalized = value.trim();
 	return normalized.length > 0 ? normalized : fallback;
@@ -197,65 +259,6 @@ function getProgress(currentStep: number): number {
 	return Math.round(((currentStep + 1) / formSteps.length) * 100);
 }
 
-function buildPreviewMarkup(data: PortfolioFormData, template: PortfolioTemplate): string {
-	const skills = data.skills
-		.split(",")
-		.map((skill) => skill.trim())
-		.filter(Boolean)
-		.slice(0, 8)
-		.map(
-			(skill) =>
-				`<span style="padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.12);font-size:12px;display:inline-block;margin:4px;">${skill}</span>`,
-		)
-		.join("");
-
-	const surface = template.tone === "dark" ? "#101319" : "#f8fafc";
-	const text = template.tone === "dark" ? "#f3f4f6" : "#111827";
-	const muted = template.tone === "dark" ? "#9ca3af" : "#4b5563";
-
-	return `
-	<!doctype html>
-	<html>
-		<head>
-			<meta charset="utf-8" />
-			<meta name="viewport" content="width=device-width, initial-scale=1" />
-			<style>
-				body { font-family: "Segoe UI", sans-serif; margin: 0; color: ${text}; background: ${surface}; }
-				.container { max-width: 840px; margin: 0 auto; padding: 40px 24px; }
-				.hero { border: 1px solid rgba(148,163,184,.35); border-radius: 20px; padding: 28px; background: linear-gradient(120deg, rgba(34,197,94,.12), rgba(14,165,233,.14)); }
-				h1 { margin: 0; font-size: 34px; line-height: 1.1; }
-				h2 { margin: 8px 0 0; font-size: 18px; color: ${muted}; font-weight: 500; }
-				p { color: ${muted}; line-height: 1.6; }
-				.section { margin-top: 28px; border: 1px solid rgba(148,163,184,.2); border-radius: 16px; padding: 20px; }
-				.btn { display: inline-block; margin-top: 16px; padding: 10px 16px; background: #0ea5e9; color: white; border-radius: 999px; text-decoration: none; font-size: 14px; }
-			</style>
-		</head>
-		<body>
-			<div class="container">
-				<div class="hero">
-					<h1>${data.fullName || "Your Name"}</h1>
-					<h2>${data.role || "Your Role"}</h2>
-					<p>${data.bio || "A concise introduction will appear here."}</p>
-					<a class="btn" href="mailto:${data.contactEmail || "you@example.com"}">${data.callToAction || "Contact Me"}</a>
-				</div>
-				<div class="section">
-					<strong>Theme Preference</strong>
-					<p>${data.theme || "Clean and modern"}</p>
-				</div>
-				<div class="section">
-					<strong>Featured Project</strong>
-					<p>${data.primaryProject || "Project summary appears here."}</p>
-				</div>
-				<div class="section">
-					<strong>Core Skills</strong>
-					<div>${skills || "<p>Add a few skills to populate this section.</p>"}</div>
-				</div>
-			</div>
-		</body>
-	</html>
-	`;
-}
-
 export default function PortfolioBuilderPage() {
 	const [stage, setStage] = useState<BuilderStage>("landing");
 	const [selectedTemplate, setSelectedTemplate] = useState<PortfolioTemplate>(templates[0]);
@@ -265,6 +268,8 @@ export default function PortfolioBuilderPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [tipIndex, setTipIndex] = useState(0);
 	const [buildResponse, setBuildResponse] = useState<BuildApiResponse | null>(null);
+	const [hasExportedZip, setHasExportedZip] = useState(false);
+	const [showDeployGuide, setShowDeployGuide] = useState(false);
 	const [formData, setFormData] = useState<PortfolioFormData>(initialFormData);
 
 	const progress = getProgress(stepIndex);
@@ -277,17 +282,32 @@ export default function PortfolioBuilderPage() {
 		[formData],
 	);
 
-	const combinedPrompt = useMemo(
-		() => buildPortfolioPrompt(formData, selectedTemplate),
-		[formData, selectedTemplate],
-	);
-
-	const previewMarkup = useMemo(() => {
-		if (buildResponse?.preview_html) {
-			return buildResponse.preview_html;
+	const resolvedPreviewUrl = useMemo(() => {
+		if (!buildResponse) {
+			return undefined;
 		}
-		return buildPreviewMarkup(formData, selectedTemplate);
-	}, [buildResponse?.preview_html, formData, selectedTemplate]);
+
+		const fallbackPath = buildResponse.session_id
+			? `/preview/${buildResponse.session_id}`
+			: undefined;
+
+		return toAbsoluteUrl(buildResponse.preview_url || fallbackPath, PORTFOLIO_API_BASE_URL);
+	}, [buildResponse]);
+
+	const resolvedDownloadUrl = useMemo(() => {
+		if (!buildResponse) {
+			return undefined;
+		}
+
+		const fallbackPath = buildResponse.session_id
+			? `/download/${buildResponse.session_id}`
+			: undefined;
+
+		return toAbsoluteUrl(
+			buildResponse.download_zip || buildResponse.export_url || fallbackPath,
+			PORTFOLIO_API_BASE_URL,
+		);
+	}, [buildResponse]);
 
 	useEffect(() => {
 		if (!isBuilding) {
@@ -333,27 +353,56 @@ export default function PortfolioBuilderPage() {
 		setTipIndex(0);
 		setSubmitting(true);
 		setError(null);
+		setHasExportedZip(false);
+		setShowDeployGuide(false);
+		setBuildResponse(null);
 
 		try {
+			const prompt = buildPortfolioPrompt(dataToBuild, selectedTemplate);
+
 			const payload = {
-				template_id: selectedTemplate.id,
-				template_name: selectedTemplate.name,
-				theme_choice: dataToBuild.theme,
-				prompt: buildPortfolioPrompt(dataToBuild, selectedTemplate),
-				user_inputs: dataToBuild,
-				...dataToBuild,
+				prompt,
 			};
 
 			const endpoint =
-				process.env.NEXT_PUBLIC_PORTFOLIO_BUILD_ENDPOINT || "/api/v1/portfolio/build";
-			const response = await apiClient.post<BuildApiResponse>(endpoint, payload);
-			setBuildResponse(response.data);
+				process.env.NEXT_PUBLIC_PORTFOLIO_BUILD_ENDPOINT ||
+				`${PORTFOLIO_API_BASE_URL}/generate`;
+			const response = await apiClient.post<BuildApiResponse>(endpoint, payload, {
+				timeout: PORTFOLIO_BUILD_TIMEOUT_MS,
+			});
+			const rawData = response.data;
+			const baseUrl = (() => {
+				try {
+					return new URL(endpoint).origin;
+				} catch {
+					return PORTFOLIO_API_BASE_URL;
+				}
+			})();
+			const normalizedResponse: BuildApiResponse = {
+				...rawData,
+				preview_url:
+					toAbsoluteUrl(
+						rawData.preview_url ||
+							(rawData.session_id ? `/preview/${rawData.session_id}` : undefined),
+						baseUrl,
+					),
+				download_zip:
+					toAbsoluteUrl(
+						rawData.download_zip ||
+							rawData.export_url ||
+							(rawData.session_id ? `/download/${rawData.session_id}` : undefined),
+						baseUrl,
+					),
+				export_url:
+					toAbsoluteUrl(
+						rawData.export_url ||
+							(rawData.session_id ? `/download/${rawData.session_id}` : undefined),
+						baseUrl,
+					),
+			};
+			setBuildResponse(normalizedResponse);
 		} catch (err: unknown) {
-			const message =
-				err instanceof Error
-					? err.message
-					: "Unable to build the portfolio right now. Please try again.";
-			setError(message);
+			setError(getApiErrorMessage(err));
 		} finally {
 			setSubmitting(false);
 			setIsBuilding(false);
@@ -376,41 +425,24 @@ export default function PortfolioBuilderPage() {
 		setStepIndex((prev) => Math.min(prev + 1, formSteps.length - 1));
 	};
 
-	const backToForm = () => {
-		setStage("form");
-		setError(null);
-	};
-
 	const exportPortfolio = () => {
-		if (buildResponse?.export_url) {
-			window.open(buildResponse.export_url, "_blank", "noopener,noreferrer");
+		if (resolvedDownloadUrl) {
+			window.open(resolvedDownloadUrl, "_blank", "noopener,noreferrer");
+			setHasExportedZip(true);
+			setError(null);
 			return;
 		}
 
-		const exportData = {
-			template: selectedTemplate.id,
-			formData,
-			generatedAt: new Date().toISOString(),
-		};
-		const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-			type: "application/json",
-		});
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = `${formData.fullName || "portfolio"}-portfolio.json`;
-		document.body.appendChild(a);
-		a.click();
-		a.remove();
-		URL.revokeObjectURL(url);
+		setError("Build portfolio first and wait for the response before exporting.");
 	};
 
 	const deployPortfolio = () => {
-		if (buildResponse?.deploy_url) {
-			window.open(buildResponse.deploy_url, "_blank", "noopener,noreferrer");
-			return;
-		}
-		setError("Deploy endpoint not configured yet. Connect deploy_url from backend response.");
+		setError(null);
+		setShowDeployGuide(true);
+	};
+
+	const openNetlifyDrop = () => {
+		window.open("https://app.netlify.com/drop", "_blank", "noopener,noreferrer");
 	};
 
 	return (
@@ -560,13 +592,6 @@ export default function PortfolioBuilderPage() {
 									</motion.div>
 								</AnimatePresence>
 
-								<div className="mt-6 rounded-2xl border border-border/70 bg-background/70 p-4">
-									<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-										Combined Prompt Preview
-									</p>
-									<p className="mt-2 text-sm leading-relaxed text-muted-foreground">{combinedPrompt}</p>
-								</div>
-
 								{error && (
 									<p className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-300">
 										{error}
@@ -630,25 +655,21 @@ export default function PortfolioBuilderPage() {
 									<p className="mt-1 text-xs text-muted-foreground sm:text-sm">
 										{isBuilding
 											? "Building portfolio from one combined prompt..."
-											: "Build request finished. You can review, export, or edit answers."}
+											: "Build request finished. You can review, export, or deploy."}
 									</p>
 								</div>
 								<div className="flex flex-wrap items-center gap-2">
 									<button
-										onClick={backToForm}
-										className="inline-flex h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium transition hover:bg-muted"
-									>
-										<ArrowLeft size={15} /> Edit Answers
-									</button>
-									<button
 										onClick={exportPortfolio}
-										className="inline-flex h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium transition hover:bg-muted"
+										disabled={!resolvedDownloadUrl || isBuilding || submitting}
+										className="inline-flex h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
 									>
 										<Download size={15} /> Export File
 									</button>
 									<button
 										onClick={deployPortfolio}
-										className="inline-flex h-10 items-center gap-2 rounded-full bg-linear-to-r from-cyan-500 to-blue-500 px-4 text-sm font-semibold text-white transition hover:scale-[1.02]"
+										disabled={!buildResponse || isBuilding || submitting}
+										className="inline-flex h-10 items-center gap-2 rounded-full bg-linear-to-r from-cyan-500 to-blue-500 px-4 text-sm font-semibold text-white transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
 									>
 										<ExternalLink size={15} /> Deploy Portfolio
 									</button>
@@ -701,11 +722,12 @@ export default function PortfolioBuilderPage() {
 										)}
 									</div>
 
-									<div className="mt-4 rounded-xl border border-border/70 bg-background/70 p-4">
-										<p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-											Prompt sent to API
-										</p>
-										<p className="mt-2 text-sm leading-relaxed text-muted-foreground">{combinedPrompt}</p>
+									<div className="mt-4 rounded-xl border border-border/70 bg-background/70 p-4 text-sm text-muted-foreground">
+										{isBuilding
+											? "Preparing your portfolio preview. This can take a few moments."
+											: buildResponse
+												? "Build complete. Export the ZIP file before opening deployment instructions."
+												: "Fill the form and click Build Portfolio to generate your portfolio."}
 									</div>
 								</div>
 
@@ -718,22 +740,75 @@ export default function PortfolioBuilderPage() {
 									</div>
 
 									<div className="h-[440px] overflow-hidden rounded-xl border border-border bg-white shadow-inner sm:h-[560px]">
-										{buildResponse?.preview_url ? (
+										{resolvedPreviewUrl ? (
 											<iframe
-												src={buildResponse.preview_url}
+												src={resolvedPreviewUrl}
 												title="Portfolio Preview"
 												className="h-full w-full"
 											/>
+										) : buildResponse?.preview_html ? (
+											<iframe
+												srcDoc={buildResponse.preview_html}
+												title="Portfolio Preview"
+												className="h-full w-full"
+											/>
+										) : isBuilding ? (
+											<div className="flex h-full flex-col items-center justify-center gap-3 bg-muted/20 p-6 text-center">
+												<Loader2 size={24} className="animate-spin text-emerald-500" />
+												<p className="text-sm font-medium">Generating live preview...</p>
+												<p className="max-w-sm text-xs text-muted-foreground">
+													Please wait while the portfolio is being prepared on the server.
+												</p>
+											</div>
 										) : (
-											<iframe
-												srcDoc={previewMarkup}
-												title="Portfolio Preview"
-												className="h-full w-full"
-											/>
+											<div className="flex h-full items-center justify-center bg-muted/20 p-6 text-center text-sm text-muted-foreground">
+												Preview will appear here after the API response arrives.
+											</div>
 										)}
 									</div>
 								</div>
 							</div>
+
+							{showDeployGuide && (
+								<div className="mt-4 rounded-2xl border border-border/80 bg-card/70 p-5 sm:p-6">
+									<h3 className="text-base font-semibold sm:text-lg">Deployment Guide (Netlify Drop)</h3>
+									<p className="mt-2 text-sm text-muted-foreground">
+										Follow these steps to deploy your generated portfolio quickly.
+									</p>
+									<div className="mt-4 space-y-2 text-sm text-muted-foreground">
+										<p>1. Export your generated portfolio ZIP file to your computer.</p>
+										<p>2. Keep the ZIP file ready (no code setup required).</p>
+										<p>3. Open Netlify Drop and drag the ZIP to publish instantly.</p>
+									</div>
+									<div className="mt-5 flex flex-wrap items-center gap-3">
+										<button
+											onClick={exportPortfolio}
+											disabled={!resolvedDownloadUrl}
+											className="inline-flex h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+										>
+											<Download size={15} /> Export ZIP First
+										</button>
+										{hasExportedZip ? (
+											<button
+												onClick={openNetlifyDrop}
+												className="inline-flex h-10 items-center gap-2 rounded-full bg-linear-to-r from-cyan-500 to-blue-500 px-4 text-sm font-semibold text-white transition hover:scale-[1.02]"
+											>
+												<ExternalLink size={15} /> Continue To Netlify Drop
+											</button>
+										) : (
+											<p className="text-xs text-muted-foreground">
+												Export is required before deployment.
+											</p>
+										)}
+										<button
+											onClick={() => setShowDeployGuide(false)}
+											className="inline-flex h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium transition hover:bg-muted"
+										>
+											Close
+										</button>
+									</div>
+								</div>
+							)}
 						</motion.section>
 					)}
 				</AnimatePresence>

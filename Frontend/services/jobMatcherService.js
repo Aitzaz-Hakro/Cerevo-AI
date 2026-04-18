@@ -1,7 +1,7 @@
 
 import axios from "axios"
 
-const API_BASE_URL = "https://job-matcher-production-dbe4.up.railway.app"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://job-matcher-production-dbe4.up.railway.app"
 
 export async function matchResumes(jobDescription, files) {
   const formData = new FormData()

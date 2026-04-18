@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://job-matcher-production-dbe4.up.railway.app"
 
 // const apiClient = axios.create({
 //   baseURL: API_BASE_URL,
@@ -9,7 +9,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/a
 //   },
 // })
 const apiClient = axios.create({
-  baseURL: "http://127.0.0.1:8000", // ✅ no extra /api
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
