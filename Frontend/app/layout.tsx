@@ -16,8 +16,8 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Cerevo | AI-Powered Career Guidance",
-  description: "Get AI-powered career guidance, resume analysis, and job recommendations",
-  keywords: ["Cerevo", "AI Career Guidance", "Resume Analysis", "Job Recommendations"],
+  description: "Get AI-powered career guidance with ATS Checker, Job Matcher, Portfolio Builder, Resume Builder, and Resume Analyzer",
+  keywords: ["Cerevo", "AI Career Guidance", "ATS Checker", "Job Matcher", "Portfolio Builder", "Resume Builder", "Resume Analyzer"],
   icons: {
     icon: "/favicon.png",
     shortcut: "/favicon.png",

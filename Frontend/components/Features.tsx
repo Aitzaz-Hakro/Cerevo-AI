@@ -2,35 +2,37 @@
 "use client";
 
 import React from "react";
-import { FileText, Zap, BookOpen, Briefcase, Target, BarChart3 } from "lucide-react";
+import Link from "next/link";
+import { FileText, Zap, BookOpen, Briefcase, Target } from "lucide-react";
 
 const features = [
-  { icon: FileText, title: "Resume Analyzer", description: "Upload your resume and let AI uncover strengths, weaknesses, and actionable improvements." },
-  { icon: Zap, title: "ATS Checker", description: "Ensure your resume passes Applicant Tracking Systems used by top employers." },
-  { icon: BookOpen, title: "AI Resume Builder", description: "Create professional, recruiter-ready resumes instantly." },
-  { icon: Briefcase, title: "Job Recommendations", description: "Get AI-powered job matches aligned with your experience." },
-  { icon: Target, title: "Job Matcher", description: "Compare your resume with job descriptions using ML-powered matching." },
-  { icon: BarChart3, title: "Skill Gap Analysis", description: "Discover which skills to improve and how to grow faster in your career path." },
-  { icon: BarChart3, title: "Job Market Insights", description: "Explore live job market trends, salary benchmarks, and growth analytics." },
-  { icon: BookOpen, title: "MCQ Generator", description: "Practice AI-generated interview questions tailored to your target role." },
+  { href: "/ats-checker", icon: Zap, title: "ATS Checker", description: "Ensure your resume passes modern Applicant Tracking Systems with actionable fixes." },
+  { href: "/job-matcher", icon: Target, title: "Job Matcher", description: "Compare your resume against a job description and get a clear match breakdown." },
+  { href: "/portfolio-builder", icon: Briefcase, title: "Portfolio Builder", description: "Generate a polished portfolio website to showcase your skills and projects." },
+  { href: "/resume-builder", icon: BookOpen, title: "Resume Builder", description: "Create recruiter-ready resumes in minutes with AI-assisted writing support." },
+  { href: "/resume-analyzer", icon: FileText, title: "Resume Analyzer", description: "Upload your resume and get detailed AI insights to improve content and impact." },
 ];
 
 export default function Features() {
   return (
     <div id="features">
-      <h2 className="text-3xl font-bold mb-8">All-in-one AI career tools</h2>
+      <h2 className="text-3xl font-bold mb-8">Cerevo Services</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {features.map((f, i) => {
           const Icon = f.icon;
           return (
-            <div key={i} className="bg-card/40 border border-border/30 rounded-lg p-6 transition hover:shadow-lg">
-              <div className="w-12 h-12 mb-3 flex items-center justify-center rounded-md bg-gradient-to-br from-teal-400/20 to-blue-500/20">
+            <Link
+              key={i}
+              href={f.href}
+              className="bg-card/40 border border-border/30 rounded-lg p-6 transition hover:shadow-lg hover:-translate-y-1 block text-left"
+            >
+              <div className="w-12 h-12 mb-3 flex items-center justify-center rounded-md bg-linear-to-br from-teal-400/20 to-blue-500/20">
                 <Icon size={20} className="text-primary" />
               </div>
               <h3 className="font-semibold mb-2">{f.title}</h3>
               <p className="text-sm text-muted-foreground">{f.description}</p>
-            </div>
+            </Link>
           );
         })}
       </div>

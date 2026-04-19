@@ -173,6 +173,7 @@ export default function ResumeAnalyzerPage() {
 
                 <FileUploader
                   onFileSelect={(f) => setFile(f)}
+                  selectedFile={file}
                   accept=".pdf,.doc,.docx"
                   label="Drop your resume here"
                 />
@@ -259,7 +260,7 @@ export default function ResumeAnalyzerPage() {
                   <div className="mt-6 p-4 bg-gradient-to-br from-primary/10 to-cyan-500/10 rounded-xl border border-primary/20">
                     <p className="text-sm font-medium mb-2">Want more features?</p>
                     <p className="text-xs text-muted-foreground mb-3">
-                      Sign up for job matching, skill gap analysis, and more.
+                      Sign up for ATS Checker, Job Matcher, Resume Builder, and Portfolio Builder.
                     </p>
                     <Link
                       href="/signup"
@@ -480,7 +481,7 @@ export default function ResumeAnalyzerPage() {
                             Want to improve your score?
                           </h3>
                           <p className="text-sm text-muted-foreground">
-                            Get job recommendations, skill gap analysis, and AI-powered resume building.
+                            Continue with ATS Checker, Job Matcher, Resume Builder, and Portfolio Builder.
                           </p>
                         </div>
                         <Link

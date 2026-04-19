@@ -128,12 +128,12 @@ export default function Hero() {
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-teal-400/20 to-blue-500/20 rounded-md flex items-center justify-center">
                         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="stroke-teal-400"/>
+                        <path d="M4 7a2 2 0 012-2h5l2 2h5a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="stroke-teal-400"/>
                         </svg>
                     </div>
                     <div>
-                      <div className="text-sm font-semibold">Job Recommendations</div>
-                      <div className="text-xs text-muted-foreground leading-snug">Personalized job matches</div>
+                      <div className="text-sm font-semibold">Portfolio Builder</div>
+                      <div className="text-xs text-muted-foreground leading-snug">Launch your project portfolio fast</div>
                     </div>
                   </div>
                 </div>

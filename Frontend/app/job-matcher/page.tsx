@@ -18,16 +18,112 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-interface MatchResult {
-  resume_name?: string;
-  similarity_score?: number;
-  snippet?: string;
+interface MatchedJob {
+  job_title: string;
+  match_percentage: number;
+  matched_skills: string[];
+}
+
+interface JobMatcherData {
+  matched_jobs: MatchedJob[];
+  missing_skills: string[];
+  suggested_skills_to_learn: string[];
+  raw?: any;
+}
+
+function normalizePercent(value: unknown): number {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+  if (numeric <= 1) return Math.round(numeric * 100);
+  return Math.max(0, Math.min(100, Math.round(numeric)));
+}
+
+function pickFirstArray(obj: Record<string, any>, keys: string[]): string[] {
+  for (const key of keys) {
+    const value = obj?.[key];
+    if (Array.isArray(value)) {
+      return value.filter(Boolean).map((item) => String(item));
+    }
+  }
+  return [];
+}
+
+function toJobMatcherData(payload: any): JobMatcherData {
+  const source = Array.isArray(payload)
+    ? payload[0] || {}
+    : Array.isArray(payload?.results)
+      ? payload.results[0] || {}
+      : payload || {};
+
+  const matchedJobs = Array.isArray(source?.matched_jobs)
+    ? source.matched_jobs.map((job: any, index: number) => ({
+        job_title: String(job?.job_title || `Matched Job ${index + 1}`),
+        match_percentage: normalizePercent(job?.match_percentage),
+        matched_skills: Array.isArray(job?.matched_skills)
+          ? job.matched_skills.filter(Boolean).map((item: any) => String(item))
+          : [],
+      }))
+    : [];
+
+  const fallbackScore = normalizePercent(
+    source?.similarity_score ??
+      source?.fit_score ??
+      source?.job_fit_score ??
+      source?.overall_score ??
+      source?.match_score ??
+      source?.score
+  );
+
+  const fallbackMatchedSkills = pickFirstArray(source, [
+    "matched_skills",
+    "skills_matched",
+    "matched_keywords",
+    "keyword_matches",
+    "matching_skills",
+  ]);
+
+  const mergedMatchedJobs =
+    matchedJobs.length > 0
+      ? matchedJobs
+      : fallbackScore > 0 || fallbackMatchedSkills.length > 0
+        ? [
+            {
+              job_title: String(source?.job_title || "Best Match"),
+              match_percentage: fallbackScore,
+              matched_skills: fallbackMatchedSkills,
+            },
+          ]
+        : [];
+
+  const missingSkills = pickFirstArray(source, [
+    "missing_skills",
+    "skill_gaps",
+    "gaps",
+    "missing_keywords",
+    "skills_missing",
+  ]);
+
+  const suggestedSkills = pickFirstArray(source, [
+    "suggested_skills_to_learn",
+    "recommendations",
+    "improvement_suggestions",
+    "suggestions",
+    "next_steps",
+    "action_items",
+  ]);
+
+  return {
+    matched_jobs: mergedMatchedJobs,
+    missing_skills: missingSkills,
+    suggested_skills_to_learn: suggestedSkills,
+    raw: source,
+  };
 }
 
 export default function JobMatcherPage() {
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
-  const [data, setData] = useState<MatchResult[] | null>(null);
+  const [data, setData] = useState<JobMatcherData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,11 +136,17 @@ export default function JobMatcherPage() {
 
     try {
       const response = await matchResumes(jobDescription, [file]);
-      // Handle response with results array
-      const results = response?.results || (Array.isArray(response) ? response : [response]);
-      setData(results);
+      const normalized = toJobMatcherData(response);
+      if (
+        normalized.matched_jobs.length === 0 &&
+        normalized.missing_skills.length === 0 &&
+        normalized.suggested_skills_to_learn.length === 0
+      ) {
+        throw new Error("API returned an empty analysis response");
+      }
+      setData(normalized);
     } catch (err: any) {
-      setError(err?.message || err || "Failed to match resume with job");
+      setError(err?.message || err || "Failed to analyze job fit");
     } finally {
       setLoading(false);
     }
@@ -75,7 +177,7 @@ export default function JobMatcherPage() {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative overflow-hidden py-16 sm:py-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-b from-blue-500/5 via-transparent to-transparent" />
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
 
@@ -91,18 +193,18 @@ export default function JobMatcherPage() {
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                 AI Job
               </span>
               <br />
-              <span className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
                 Matcher
               </span>
             </h1>
 
             <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               See how well your resume matches any job description. Get detailed skill alignment
-              and personalized improvement suggestions.
+              and personalized recommendations from the live Job Matcher API.
             </p>
 
             {/* Features */}
@@ -138,7 +240,7 @@ export default function JobMatcherPage() {
                 {/* Resume Upload */}
                 <div>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
+                    <div className="p-2.5 rounded-xl bg-linear-to-br from-blue-500/20 to-indigo-500/20">
                       <FileText className="text-blue-500" size={22} />
                     </div>
                     <div>
@@ -149,6 +251,7 @@ export default function JobMatcherPage() {
 
                   <FileUploader
                     onFileSelect={(f) => setFile(f)}
+                    selectedFile={file}
                     accept=".pdf,.doc,.docx"
                     label="Drop your resume here"
                   />
@@ -173,7 +276,7 @@ export default function JobMatcherPage() {
                 {/* Job Description */}
                 <div>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
+                    <div className="p-2.5 rounded-xl bg-linear-to-br from-indigo-500/20 to-purple-500/20">
                       <Briefcase className="text-indigo-500" size={22} />
                     </div>
                     <div>
@@ -206,7 +309,7 @@ export default function JobMatcherPage() {
                     className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl
                     text-white font-semibold transition-all duration-300
                     ${file && jobDescription.trim() && !loading
-                      ? "bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02]"
+                      ? "bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02]"
                       : "bg-muted text-muted-foreground cursor-not-allowed"
                     }`}
                   >
@@ -290,7 +393,7 @@ export default function JobMatcherPage() {
                     animate={{ opacity: 1 }}
                     className="flex flex-col items-center justify-center py-20 sm:py-28 bg-card border border-border rounded-2xl"
                   >
-                    <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 mb-6">
+                    <div className="p-5 rounded-2xl bg-linear-to-br from-blue-500/10 to-indigo-500/10 mb-6">
                       <Users size={48} className="text-blue-500" />
                     </div>
                     <h3 className="text-xl font-semibold mb-2">Match Your Resume</h3>
@@ -315,20 +418,19 @@ export default function JobMatcherPage() {
                     animate={{ opacity: 1 }}
                     className="space-y-6"
                   >
-                    {data.map((result, index) => {
-                      const score = result.similarity_score || 0;
+                    {data.matched_jobs.map((job, index) => {
+                      const score = job.match_percentage || 0;
 
                       return (
                         <motion.div
-                          key={index}
+                          key={`${job.job_title}-${index}`}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1 }}
                           className="bg-card border border-border rounded-2xl overflow-hidden p-5 sm:p-6"
                         >
                           <div className="flex items-center gap-4">
-                            {/* Score Circle */}
-                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0">
                               <svg className="w-full h-full -rotate-90">
                                 <circle
                                   cx="50%"
@@ -364,38 +466,88 @@ export default function JobMatcherPage() {
                             </div>
 
                             <div className="flex-1">
-                              <h3 className="font-semibold text-lg mb-1">
-                                {result.resume_name || file?.name || "Your Resume"}
-                              </h3>
-                              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getScoreGradient(score)} text-white`}>
+                              <h3 className="font-semibold text-lg mb-1">{job.job_title}</h3>
+                              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-linear-to-r ${getScoreGradient(score)} text-white`}>
                                 <TrendingUp size={12} />
                                 {score >= 80 ? "Excellent Match" : score >= 60 ? "Good Match" : score >= 40 ? "Fair Match" : "Low Match"}
                               </div>
                             </div>
                           </div>
 
-                          {/* Snippet/Summary */}
-                          {result.snippet && (
-                            <div className="mt-4 p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Sparkles size={16} className="text-blue-500" />
-                                <span className="font-medium text-sm">Match Summary</span>
+                          {job.matched_skills.length > 0 && (
+                            <div className="mt-4 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+                              <h4 className="text-sm font-semibold text-emerald-500 mb-3">Matched Skills</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {job.matched_skills.map((skill, i) => (
+                                  <span
+                                    key={`${skill}-${i}`}
+                                    className="px-2.5 py-1 rounded-full text-xs bg-emerald-500/15 text-emerald-500"
+                                  >
+                                    {skill}
+                                  </span>
+                                ))}
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                {result.snippet}
-                              </p>
                             </div>
                           )}
                         </motion.div>
                       );
                     })}
 
+                    {data.missing_skills.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-card border border-border rounded-2xl p-5 sm:p-6"
+                      >
+                        <h3 className="text-lg font-semibold mb-3 text-amber-500">Missing Skills</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {data.missing_skills.map((skill, i) => (
+                            <span
+                              key={`${skill}-${i}`}
+                              className="px-2.5 py-1 rounded-full text-xs bg-amber-500/15 text-amber-500"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {data.suggested_skills_to_learn.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-card border border-border rounded-2xl p-5 sm:p-6"
+                      >
+                        <h3 className="text-lg font-semibold mb-3 text-indigo-500">Suggested Skills to Learn</h3>
+                        <ul className="space-y-2 text-sm text-muted-foreground">
+                          {data.suggested_skills_to_learn.map((skill, i) => (
+                            <li key={`${skill}-${i}`} className="flex items-start gap-2">
+                              <Sparkles size={14} className="mt-0.5 text-indigo-500" />
+                              <span>{skill}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </motion.div>
+                    )}
+
+                    {data.matched_jobs.length === 0 &&
+                      data.missing_skills.length === 0 &&
+                      data.suggested_skills_to_learn.length === 0 && (
+                        <div className="mt-4 p-4 bg-muted/30 border border-border/60 rounded-xl">
+                          <h4 className="text-sm font-semibold mb-2">API Response</h4>
+                          <pre className="text-xs text-muted-foreground overflow-x-auto whitespace-pre-wrap wrap-break-word">
+                            {JSON.stringify(data.raw, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+
                     {/* CTA Banner */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-purple-500/10 border border-blue-500/20 rounded-2xl p-6 sm:p-8"
+                      className="bg-linear-to-br from-blue-500/10 via-indigo-500/5 to-purple-500/10 border border-blue-500/20 rounded-2xl p-6 sm:p-8"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div className="flex-1">
@@ -403,13 +555,13 @@ export default function JobMatcherPage() {
                             Bridge your skill gaps
                           </h3>
                           <p className="text-sm text-muted-foreground">
-                            Sign up to get personalized learning paths and job recommendations.
+                            Sign up to unlock Resume Analyzer, ATS Checker, Resume Builder, and Portfolio Builder.
                           </p>
                         </div>
                         <Link
                           href="/signup"
                           className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl
-                          bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold
+                          bg-linear-to-r from-blue-500 to-indigo-500 text-white font-semibold
                           hover:shadow-lg hover:shadow-blue-500/25 transition-all shrink-0"
                         >
                           Get Started

@@ -141,6 +141,17 @@ export default function ATSCheckerPage() {
     needsWork: Object.entries(data.criteria).filter(([_, v]) => v.score < 60),
   } : null;
 
+  const criteriaEntries = data?.criteria ? Object.entries(data.criteria) : [];
+  const strengths = [...criteriaEntries]
+    .filter(([_, value]) => value.score >= 80)
+    .sort((a, b) => b[1].score - a[1].score)
+    .slice(0, 4);
+  const priorityFixes = [...criteriaEntries]
+    .filter(([_, value]) => value.score < 70)
+    .sort((a, b) => a[1].score - b[1].score)
+    .slice(0, 4);
+  const criticalAlerts = criteriaEntries.filter(([_, value]) => value.score < 50);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -217,6 +228,7 @@ export default function ATSCheckerPage() {
 
                 <FileUploader
                   onFileSelect={(f) => setFile(f)}
+                  selectedFile={file}
                   accept=".pdf,.doc,.docx"
                   label="Drop your resume here"
                 />
@@ -460,6 +472,87 @@ export default function ATSCheckerPage() {
                           <div className="text-xl sm:text-2xl font-bold text-red-500">{groupedCriteria.needsWork.length}</div>
                           <div className="text-[10px] sm:text-xs text-muted-foreground">Needs Work</div>
                         </div>
+                      </motion.div>
+                    )}
+
+                    {/* Visual Insights */}
+                    {(strengths.length > 0 || priorityFixes.length > 0 || criticalAlerts.length > 0) && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.08 }}
+                        className="grid grid-cols-1 xl:grid-cols-2 gap-4"
+                      >
+                        <div className="bg-card border border-emerald-500/20 rounded-2xl p-4 sm:p-5">
+                          <h3 className="font-semibold text-sm sm:text-base text-emerald-500 flex items-center gap-2 mb-3">
+                            <CheckCircle size={16} />
+                            Top Strengths
+                          </h3>
+                          {strengths.length > 0 ? (
+                            <div className="space-y-2.5">
+                              {strengths.map(([key, value]) => {
+                                const config = criteriaConfig[key] || {
+                                  label: key.replace(/_/g, " "),
+                                  icon: CheckCircle,
+                                };
+                                return (
+                                  <div key={key} className="flex items-center justify-between gap-3 text-sm">
+                                    <span className="text-foreground/90 truncate">{config.label}</span>
+                                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-500">
+                                      {value.score}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">No strong criteria yet. Improve more sections to surface strengths.</p>
+                          )}
+                        </div>
+
+                        <div className="bg-card border border-red-500/20 rounded-2xl p-4 sm:p-5">
+                          <h3 className="font-semibold text-sm sm:text-base text-red-500 flex items-center gap-2 mb-3">
+                            <XCircle size={16} />
+                            Priority Fixes
+                          </h3>
+                          {priorityFixes.length > 0 ? (
+                            <div className="space-y-2.5">
+                              {priorityFixes.map(([key, value]) => {
+                                const config = criteriaConfig[key] || {
+                                  label: key.replace(/_/g, " "),
+                                  icon: AlertCircle,
+                                };
+                                return (
+                                  <div key={key} className="flex items-center justify-between gap-3 text-sm">
+                                    <span className="text-foreground/90 truncate">{config.label}</span>
+                                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getScoreBg(value.score)} ${getScoreColor(value.score)} border`}>
+                                      {value.score}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">Great job. No urgent weak spots detected.</p>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {criticalAlerts.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.09 }}
+                        className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 sm:p-5"
+                      >
+                        <h3 className="font-semibold text-sm sm:text-base text-red-500 mb-2 flex items-center gap-2">
+                          <AlertCircle size={16} />
+                          Critical Attention Needed
+                        </h3>
+                        <p className="text-xs sm:text-sm text-red-500/90">
+                          Focus first on {criticalAlerts.map(([key]) => criteriaConfig[key]?.label || key.replace(/_/g, " ")).join(", ")}. Improving these low-score areas will increase ATS pass probability fastest.
+                        </p>
                       </motion.div>
                     )}
 

@@ -2,24 +2,35 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Upload, X } from "lucide-react"
 import { motion } from "framer-motion"
 
 interface FileUploaderProps {
-  onFileSelect: (file: File) => void
+  onFileSelect: (file: File | null) => void
+  selectedFile?: File | null
   accept?: string
   label?: string
 }
 
 export default function FileUploader({
   onFileSelect,
+  selectedFile,
   accept = ".pdf,.doc,.docx",
   label = "Upload File",
 }: FileUploaderProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (selectedFile === null) {
+      setFile(null)
+      if (inputRef.current) {
+        inputRef.current.value = ""
+      }
+    }
+  }, [selectedFile])
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -37,6 +48,9 @@ export default function FileUploader({
     if (droppedFile) {
       setFile(droppedFile)
       onFileSelect(droppedFile)
+    } else {
+      setFile(null)
+      onFileSelect(null)
     }
   }
 
@@ -45,6 +59,18 @@ export default function FileUploader({
     if (selectedFile) {
       setFile(selectedFile)
       onFileSelect(selectedFile)
+    } else {
+      setFile(null)
+      onFileSelect(null)
+    }
+  }
+
+  const handleRemoveFile = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    setFile(null)
+    onFileSelect(null)
+    if (inputRef.current) {
+      inputRef.current.value = ""
     }
   }
 
@@ -73,7 +99,7 @@ export default function FileUploader({
           className="mt-4 p-4 bg-muted rounded-lg flex items-center justify-between"
         >
           <span className="text-sm font-medium truncate">{file.name}</span>
-          <button onClick={() => setFile(null)} className="p-1 hover:bg-background rounded transition">
+          <button onClick={handleRemoveFile} className="p-1 hover:bg-background rounded transition">
             <X size={18} />
           </button>
         </motion.div>

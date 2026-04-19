@@ -1,25 +1,27 @@
 "use client"
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { Menu, X, Moon, Sun, LogOut, User, FileText, Shield, Target, Brain, TrendingUp, ChevronDown } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { Menu, X, Moon, Sun, LogOut, User, FileText, Shield, Target, Briefcase, BookOpen } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import Image from "next/image"
 import { createClient } from "@/utils/supabase/client"
 import { signout } from "@/lib/auth-actions"
+import BrandLogo from "@/components/BrandLogo"
 
 // Navigation links
 const navLinks = [
-  // { href: "/resume-analyzer", label: "Resume Analyzer", icon: FileText },
   { href: "/ats-checker", label: "ATS Checker", icon: Shield },
   { href: "/job-matcher", label: "Job Matcher", icon: Target },
-  // { href: "/mcq-generator", label: "MCQ Generator", icon: Brain },
-  // { href: "/skill-gap", label: "Skill Gap", icon: TrendingUp },
+  { href: "/portfolio-builder", label: "Portfolio Builder", icon: Briefcase },
+  { href: "/resume-builder", label: "Resume Builder", icon: BookOpen },
+  { href: "/resume-analyzer", label: "Resume Analyzer", icon: FileText },
 ]
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [isDark, setIsDark] = useState(false)
   const [user, setUser] = useState<any>(null)
+  const pathname = usePathname()
   
   // Create supabase client only once
   const supabase = useMemo(() => createClient(), [])
@@ -68,64 +70,42 @@ export default function Header() {
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || "User"
   const userAvatar = user?.user_metadata?.avatar_url || "https://www.pngmart.com/files/23/Profile-PNG-Photo.png"
 
-  const [servicesOpen, setServicesOpen] = useState(false)
-
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/90 backdrop-blur-xl">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+        <Link href="/" className="flex items-center gap-2 shrink-0">
           {/* logo*/}
-          <Image src="/logo.png" alt="Cerevo Logo" width={200} height={200} />
-                 </Link>
+          <BrandLogo width={180} height={180} className="w-auto h-10" priority />
+        </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-6">
-          {/* Services Dropdown */}
-          <div 
-            className="relative"
-            onMouseEnter={() => setServicesOpen(true)}
-            onMouseLeave={() => setServicesOpen(false)}
-          >
-            <button 
-              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition"
-            >
-              Tools
-              <ChevronDown size={14} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
-            </button>
-            
-            <AnimatePresence>
-              {servicesOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute top-full left-0 mt-2 w-56 bg-card border border-border rounded-xl shadow-lg overflow-hidden"
+        <div className="hidden lg:flex items-center gap-4 w-full justify-end">
+          <div className="flex items-center gap-1 rounded-full border border-border/60 bg-card/40 p-1">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`)
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm transition ${
+                    isActive
+                      ? "bg-linear-to-r from-teal-400/20 to-blue-500/20 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                  }`}
                 >
-                  {navLinks.map((link, index) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted/50 transition"
-                    >
-                      <link.icon size={16} />
-                      {link.label}
-                    </Link>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <link.icon size={15} />
+                  <span>{link.label}</span>
+                </Link>
+              )
+            })}
           </div>
 
           {user ? (
             <>
-              {/* <Link href="/dashboard" className="text-sm hover:text-primary transition">
-                Dashboard
-              </Link> */}
-              <button onClick={toggleTheme} className="p-2 hover:bg-muted rounded-lg transition">
+              <button onClick={toggleTheme} className="p-2 hover:bg-muted rounded-lg transition border border-border/50">
                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
               </button>
-              <div className="flex items-center gap-3 pl-4 border-l border-border">
+              <div className="flex items-center gap-3 pl-4 border-l border-border/70">
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-card/50 border border-border/50 rounded-lg">
                   {userAvatar ? (
                     <img
@@ -134,7 +114,7 @@ export default function Header() {
                       className="w-8 h-8 rounded-full object-cover border-2 border-primary/20"
                     />
                   ) : (
-                    <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-linear-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center">
                       <User size={16} className="text-white" />
                     </div>
                   )}
@@ -152,16 +132,16 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link href="/login" className="text-sm hover:text-primary transition">
+              <Link href="/login" className="text-sm text-muted-foreground hover:text-primary transition">
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="px-4 py-2 bg-gradient-to-r from-teal-400 to-blue-500 text-white rounded-lg hover:shadow-lg transition"
+                className="px-4 py-2 bg-linear-to-r from-teal-400 to-blue-500 text-white rounded-lg hover:shadow-lg transition shadow-primary/20"
               >
                 Sign Up
               </Link>
-              <button onClick={toggleTheme} className="p-2 hover:bg-muted rounded-lg transition">
+              <button onClick={toggleTheme} className="p-2 hover:bg-muted rounded-lg transition border border-border/50">
                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
               </button>
             </>
@@ -169,7 +149,7 @@ export default function Header() {
         </div>
 
         {/* Mobile Menu Button */}
-        <button onClick={() => setIsOpen(!isOpen)} className="md:hidden p-2 hover:bg-muted rounded-lg">
+        <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden p-2 hover:bg-muted rounded-lg border border-border/50">
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </nav>
@@ -180,16 +160,16 @@ export default function Header() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="md:hidden bg-card border-b border-border p-4 space-y-3"
+          className="lg:hidden bg-card border-b border-border p-4 space-y-3"
         >
-          {/* Navigation Links - Always visible on mobile */}
+          {/* Service Links */}
           <div className="pb-3 mb-3 border-b border-border/50">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2 text-sm hover:text-primary py-2"
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary py-2"
               >
                 <link.icon size={16} />
                 {link.label}
@@ -207,7 +187,7 @@ export default function Header() {
                     className="w-10 h-10 rounded-full object-cover border-2 border-primary/20"
                   />
                 ) : (
-                  <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-linear-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center">
                     <User size={18} className="text-white" />
                   </div>
                 )}
@@ -216,8 +196,8 @@ export default function Header() {
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </div>
               </div>
-              <Link href="/dashboard" onClick={() => setIsOpen(false)} className="block text-sm hover:text-primary py-2">
-                Dashboard
+              <Link href="/ats-checker" onClick={() => setIsOpen(false)} className="block text-sm hover:text-primary py-2">
+                Services
               </Link>
               <button
                 onClick={toggleTheme}
@@ -226,7 +206,6 @@ export default function Header() {
                 {isDark ? <Sun size={16} /> : <Moon size={16} />}
                 {isDark ? "Light Mode" : "Dark Mode"}
               </button>
-              <Link href="handleLogout" >
               <button
                 onClick={handleLogout}
                 className="w-full text-left text-sm text-destructive hover:text-destructive/80 py-2 flex items-center gap-2"
@@ -234,8 +213,6 @@ export default function Header() {
                 <LogOut size={16} />
                 Logout
               </button>
-              </Link>
-              
             </>
           ) : (
             <>

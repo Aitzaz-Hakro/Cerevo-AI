@@ -1,23 +1,43 @@
 
 import axios from "axios"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://job-matcher-production-dbe4.up.railway.app"
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_JOB_MATCHER_API_URL ||
+  "https://web-production-f1221.up.railway.app"
+
+const getBaseUrl = () => API_BASE_URL.replace(/\/$/, "")
 
 export async function matchResumes(jobDescription, files) {
+  if (!files?.length) {
+    throw new Error("Please upload a resume file")
+  }
+
   const formData = new FormData()
   formData.append("job_description", jobDescription)
-  files.forEach((file) => formData.append("resumes", file))
+  formData.append("resume_file", files[0])
 
   try {
-    const response = await axios.post(`${API_BASE_URL}/api/v1/job-matcher/semantic-match`, formData, {
+    const response = await axios.post(`${getBaseUrl()}/analyze`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
+      timeout: 120000,
     })
     return response.data
   } catch (error) {
     console.error("Error matching resumes:", error)
-    throw error.response?.data?.detail || "Failed to match resumes"
+
+    const detail = error?.response?.data?.detail
+    const detailMessage = Array.isArray(detail)
+      ? detail.map((entry) => entry?.msg || JSON.stringify(entry)).join("; ")
+      : detail
+
+    const apiMessage =
+      detailMessage ||
+      error?.response?.data?.message ||
+      (typeof error?.response?.data === "string" ? error.response.data : null)
+
+    throw new Error(apiMessage || "Failed to analyze job fit")
   }
 }
 

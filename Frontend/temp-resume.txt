@@ -1,0 +1,1 @@
+John Doe\nPython, React, SQL\n3 years experience

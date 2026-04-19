@@ -7,7 +7,7 @@ import {
   Upload, 
   FileSearch, 
   Target, 
-  Brain, 
+  Briefcase, 
   Rocket,
   ArrowRight,
   Sparkles
@@ -50,9 +50,9 @@ const steps = [
   },
   {
     number: "04",
-    title: "Skill Gap Analysis",
-    description: "Discover missing skills and get personalized learning paths to level up your career.",
-    icon: Brain,
+    title: "Portfolio Builder",
+    description: "Turn your projects and achievements into a polished portfolio you can share with recruiters.",
+    icon: Briefcase,
     gradient: "from-emerald-500 via-teal-400 to-cyan-400",
     shadowColor: "shadow-emerald-500/20",
     borderGlow: "hover:shadow-emerald-500/30",
@@ -302,7 +302,7 @@ export default function About() {
                   </Link>
                   
                   <Link
-                    href="/dashboard"
+                    href="/ats-checker"
                     className="
                       flex items-center justify-center gap-2 
                       px-6 py-3 rounded-xl font-semibold
@@ -310,7 +310,7 @@ export default function About() {
                       transition-all duration-300
                     "
                   >
-                    View Dashboard
+                    Explore Services
                   </Link>
                 </div>
 

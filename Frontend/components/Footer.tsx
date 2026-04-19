@@ -3,15 +3,15 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Linkedin, Github } from "lucide-react";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function Footer() {
   return (
     <footer className="border-t border-border/20 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <Image src="/logo.png" alt="Cerevo" width={100} height={32} />
+          <BrandLogo width={100} height={32} alt="Cerevo" className="w-auto h-8" />
           <div className="text-sm text-muted-foreground">© {new Date().getFullYear()} Cerevo AI Career Platform</div>
         </div>
 

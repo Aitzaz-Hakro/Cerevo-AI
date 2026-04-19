@@ -8,7 +8,7 @@ import { Mail, Lock, Chrome , Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { login } from "@/lib/auth-actions"
 import SignInWithGoogleButton from "./SignInWithGoogleButton"
-import Image from "next/image"
+import BrandLogo from "@/components/BrandLogo"
 
 export function LoginForm() {
   const [email, setEmail] = useState("")
@@ -49,11 +49,10 @@ export function LoginForm() {
         <div className="bg-card/60 backdrop-blur-md border border-border/50 rounded-lg p-8 mx-auto w-full sm:w-[90vw] md:w-[50vw] lg:w-[40vw]">
           <div className="text-center mb-8">
             <div className="w-16 h-16  rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Image
-          src="/logo.png"
-          alt="Cerevo Logo"
-          width={100}
-          height={100}
+              <BrandLogo
+                width={100}
+                height={100}
+                className="w-14 h-14 object-contain"
               />
               </div>
             <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
@@ -126,7 +125,7 @@ export function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-gradient-to-r from-teal-400 to-blue-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100"
+              className="w-full py-2.5 bg-linear-to-r from-teal-400 to-blue-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100"
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>
