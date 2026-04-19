@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Resume - Classic Professional</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Source+Sans+3:wght@300;400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 10.5pt;
+    color: #1a1a1a;
+    background: #fff;
+    line-height: 1.45;
+  }
+
+  .page {
+    width: 794px;
+    min-height: 1123px;
+    margin: 0 auto;
+    padding: 48px 54px;
+    background: #fff;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #1a1a1a;
+  }
+
+  .header h1 {
+    font-family: 'Merriweather', serif;
+    font-size: 26pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #0f0f0f;
+    margin-bottom: 4px;
+  }
+
+  .header .title {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .contact-line {
+    font-size: 9.5pt;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+
+  .contact-line a { color: #1a1a1a; text-decoration: none; }
+  .contact-line span.sep { color: #999; }
+
+  /* ── SECTION ── */
+  .section { margin-bottom: 16px; }
+
+  .section-title {
+    font-family: 'Merriweather', serif;
+    font-size: 10.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #0f0f0f;
+    border-bottom: 1px solid #1a1a1a;
+    padding-bottom: 3px;
+    margin-bottom: 10px;
+  }
+
+  /* ── SUMMARY ── */
+  .summary p {
+    font-size: 10pt;
+    color: #2d2d2d;
+    line-height: 1.55;
+  }
+
+  /* ── EXPERIENCE / EDUCATION ENTRIES ── */
+  .entry { margin-bottom: 12px; }
+  .entry:last-child { margin-bottom: 0; }
+
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1px;
+  }
+
+  .entry-title {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #0f0f0f;
+  }
+
+  .entry-date {
+    font-size: 9.5pt;
+    color: #555;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  .entry-sub {
+    font-size: 10pt;
+    color: #444;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .entry ul {
+    padding-left: 17px;
+    list-style: disc;
+  }
+
+  .entry ul li {
+    font-size: 10pt;
+    color: #2d2d2d;
+    margin-bottom: 3px;
+    line-height: 1.45;
+  }
+
+  /* ── SKILLS ── */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 24px;
+  }
+
+  .skill-row { display: flex; gap: 6px; }
+  .skill-label {
+    font-weight: 700;
+    font-size: 10pt;
+    color: #0f0f0f;
+    min-width: 130px;
+    flex-shrink: 0;
+  }
+  .skill-value { font-size: 10pt; color: #2d2d2d; }
+
+  /* ── PROJECTS ── */
+  .project { margin-bottom: 10px; }
+  .project-name {
+    font-weight: 700;
+    font-size: 10.5pt;
+    color: #0f0f0f;
+  }
+  .project-desc {
+    font-size: 10pt;
+    color: #2d2d2d;
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+
+  @media print {
+    body { margin: 0; }
+    .page { margin: 0; padding: 36px 44px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <h1>John Anderson</h1>
+    <div class="title">Senior Software Engineer</div>
+    <div class="contact-line">
+      <a href="mailto:john.anderson@email.com">john.anderson@email.com</a>
+      <span class="sep">|</span>
+      <span>+1 (555) 234-5678</span>
+      <span class="sep">|</span>
+      <a href="https://linkedin.com/in/johnanderson">linkedin.com/in/johnanderson</a>
+      <span class="sep">|</span>
+      <a href="https://github.com/johnanderson">github.com/johnanderson</a>
+      <span class="sep">|</span>
+      <span>San Francisco, CA</span>
+    </div>
+  </header>
+
+  <!-- SUMMARY -->
+  <section class="section summary">
+    <div class="section-title">Professional Summary</div>
+    <p>Results-driven Software Engineer with 6+ years of experience designing and building scalable web applications. Proficient in React, Node.js, TypeScript, and cloud platforms (AWS, GCP). Proven track record of leading cross-functional teams, reducing system latency by 40%, and shipping features that serve millions of users. Strong communicator who bridges technical and business priorities effectively.</p>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="section">
+    <div class="section-title">Professional Experience</div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <span class="entry-title">Senior Software Engineer</span>
+        <span class="entry-date">Jan 2022 – Present</span>
+      </div>
+      <div class="entry-sub">Stripe, Inc. — San Francisco, CA</div>
+      <ul>
+        <li>Architected and shipped a real-time payment dashboard serving 2M+ merchants, reducing page load time by 42% through code splitting and edge caching.</li>
+        <li>Led a team of 5 engineers to migrate a monolithic Rails API to microservices, cutting deployment frequency from weekly to multiple times per day.</li>
+        <li>Built an internal design-system component library adopted by 12 product teams, eliminating 30% of redundant UI code across the organization.</li>
+        <li>Mentored 3 junior engineers, two of whom were promoted to mid-level within 18 months.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <span class="entry-title">Software Engineer</span>
+        <span class="entry-date">Jul 2019 – Dec 2021</span>
+      </div>
+      <div class="entry-sub">Airbnb — San Francisco, CA</div>
+      <ul>
+        <li>Developed core features for the Experiences marketplace, contributing to $120M in new revenue within the first year of launch.</li>
+        <li>Reduced GraphQL query response times by 35% through query optimization and dataloader batching strategies.</li>
+        <li>Implemented end-to-end testing suite using Cypress, increasing test coverage from 45% to 88%.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <span class="entry-title">Junior Frontend Developer</span>
+        <span class="entry-date">Jun 2018 – Jun 2019</span>
+      </div>
+      <div class="entry-sub">Acme Corp — New York, NY</div>
+      <ul>
+        <li>Built responsive UI components in React for a SaaS analytics platform, improving user engagement by 22%.</li>
+        <li>Collaborated with UX designers to translate Figma prototypes into pixel-perfect, accessible interfaces.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="section">
+    <div class="section-title">Technical Skills</div>
+    <div class="skills-grid">
+      <div class="skill-row">
+        <span class="skill-label">Languages:</span>
+        <span class="skill-value">JavaScript, TypeScript, Python, SQL</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Frameworks:</span>
+        <span class="skill-value">React, Next.js, Node.js, Express, GraphQL</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Cloud / DevOps:</span>
+        <span class="skill-value">AWS, GCP, Docker, Kubernetes, CI/CD</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Databases:</span>
+        <span class="skill-value">PostgreSQL, MySQL, MongoDB, Redis</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Tools:</span>
+        <span class="skill-value">Git, GitHub, Jira, Figma, Postman</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Soft Skills:</span>
+        <span class="skill-value">Leadership, Communication, Agile/Scrum</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="section">
+    <div class="section-title">Key Projects</div>
+    <div class="project">
+      <div class="project-name">OpenMetrics — Open Source Monitoring Dashboard</div>
+      <div class="project-desc">Built a real-time server monitoring tool with React, WebSockets, and Node.js. Achieved 1,400+ GitHub stars and 200+ weekly downloads on npm. Integrated with Prometheus and Grafana APIs.</div>
+    </div>
+    <div class="project">
+      <div class="project-name">CartFlow — E-commerce Checkout Optimization SDK</div>
+      <div class="project-desc">Developed a JavaScript SDK that reduces checkout abandonment by detecting hesitation patterns and triggering personalized nudges. Used by 15 Shopify stores processing $2M+ monthly GMV.</div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section class="section">
+    <div class="section-title">Education</div>
+    <div class="entry">
+      <div class="entry-header">
+        <span class="entry-title">B.S. Computer Science</span>
+        <span class="entry-date">May 2018</span>
+      </div>
+      <div class="entry-sub">University of California, Berkeley — Berkeley, CA | GPA: 3.7/4.0</div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATIONS -->
+  <section class="section">
+    <div class="section-title">Certifications</div>
+    <div class="skills-grid">
+      <div class="skill-row">
+        <span class="skill-value">AWS Certified Solutions Architect – Associate (2023)</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-value">Google Professional Cloud Developer (2022)</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

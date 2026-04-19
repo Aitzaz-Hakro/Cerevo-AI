@@ -355,7 +355,7 @@ export default function PortfolioBuilderPage() {
 		setError(null);
 		setHasExportedZip(false);
 		setShowDeployGuide(false);
-		setBuildResponse(null);
+		setBuildResponse(null);  
 
 		try {
 			const prompt = buildPortfolioPrompt(dataToBuild, selectedTemplate);
@@ -460,7 +460,7 @@ export default function PortfolioBuilderPage() {
 										Portfolio Builder
 									</div>
 									<h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">
-										Build a portfolio in one API call
+										Build a portfolio with just a few prompts. No design or dev needed.
 									</h1>
 									<p className="mx-auto mt-4 max-w-2xl text-sm text-muted-foreground sm:text-base">
 										Choose a template, answer quick guided questions, skip any step if needed, and generate a ready-to-share preview.

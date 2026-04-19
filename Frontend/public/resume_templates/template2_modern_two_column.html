@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Resume - Modern Two-Column</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10pt;
+    color: #1c1c1e;
+    background: #fff;
+    line-height: 1.5;
+  }
+
+  .page {
+    width: 794px;
+    min-height: 1123px;
+    margin: 0 auto;
+    background: #fff;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  /* ── TOP HEADER (full width) ── */
+  .header {
+    grid-column: 1 / -1;
+    background: #1a2744;
+    color: #fff;
+    padding: 32px 36px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .header-left h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28pt;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    line-height: 1.1;
+    color: #fff;
+  }
+
+  .header-left .title {
+    font-size: 10.5pt;
+    font-weight: 500;
+    color: #8fa8d8;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+  }
+
+  .header-right {
+    text-align: right;
+    font-size: 9.5pt;
+    color: #c8d8f0;
+    line-height: 1.8;
+  }
+
+  .header-right a { color: #c8d8f0; text-decoration: none; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: #f5f7fb;
+    padding: 26px 22px;
+    border-right: 1px solid #e2e8f0;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    padding: 26px 32px;
+  }
+
+  /* ── SECTION TITLES ── */
+  .section { margin-bottom: 20px; }
+  .section:last-child { margin-bottom: 0; }
+
+  .section-title {
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #1a2744;
+    border-bottom: 2px solid #1a2744;
+    padding-bottom: 4px;
+    margin-bottom: 12px;
+  }
+
+  .sidebar .section-title {
+    font-size: 7pt;
+    color: #1a2744;
+    border-bottom-color: #1a2744;
+  }
+
+  /* ── SIDEBAR: SKILLS ── */
+  .skill-category { margin-bottom: 10px; }
+  .skill-category-name {
+    font-size: 9pt;
+    font-weight: 700;
+    color: #1a2744;
+    margin-bottom: 4px;
+  }
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+  .skill-tag {
+    background: #dce6f5;
+    color: #1a2744;
+    font-size: 8pt;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  /* ── SIDEBAR: CONTACT ── */
+  .contact-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 7px;
+  }
+  .contact-label {
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6b7a99;
+    margin-bottom: 1px;
+  }
+  .contact-value {
+    font-size: 9pt;
+    color: #1c1c1e;
+    word-break: break-word;
+  }
+  .contact-value a { color: #1a2744; text-decoration: none; font-weight: 500; }
+
+  /* ── SIDEBAR: EDUCATION ── */
+  .edu-entry { margin-bottom: 10px; }
+  .edu-degree {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #1c1c1e;
+  }
+  .edu-school {
+    font-size: 9pt;
+    color: #444;
+    margin-top: 1px;
+  }
+  .edu-date {
+    font-size: 8.5pt;
+    color: #6b7a99;
+    margin-top: 1px;
+  }
+
+  /* ── SIDEBAR: CERTIFICATIONS ── */
+  .cert-item {
+    font-size: 9pt;
+    color: #2d2d2d;
+    margin-bottom: 5px;
+    padding-left: 10px;
+    position: relative;
+  }
+  .cert-item::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: #1a2744;
+    font-size: 8pt;
+  }
+
+  /* ── MAIN: EXPERIENCE ── */
+  .entry { margin-bottom: 14px; }
+  .entry:last-child { margin-bottom: 0; }
+
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1px;
+  }
+
+  .entry-title {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #0f0f0f;
+  }
+
+  .entry-date {
+    font-size: 9pt;
+    color: #6b7a99;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .entry-sub {
+    font-size: 9.5pt;
+    color: #1a2744;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .entry ul {
+    padding-left: 16px;
+    list-style: disc;
+  }
+
+  .entry ul li {
+    font-size: 9.5pt;
+    color: #2d2d2d;
+    margin-bottom: 3px;
+    line-height: 1.45;
+  }
+
+  /* ── MAIN: SUMMARY ── */
+  .summary p {
+    font-size: 9.5pt;
+    color: #2d2d2d;
+    line-height: 1.6;
+  }
+
+  /* ── MAIN: PROJECTS ── */
+  .project { margin-bottom: 9px; }
+  .project-name {
+    font-weight: 700;
+    font-size: 10pt;
+    color: #0f0f0f;
+  }
+  .project-desc {
+    font-size: 9.5pt;
+    color: #3d3d3d;
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+
+  @media print {
+    body { margin: 0; }
+    .page { margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <h1>Sarah Mitchell</h1>
+      <div class="title">Product Designer &amp; UX Strategist</div>
+    </div>
+    <div class="header-right">
+      <div><a href="mailto:sarah.mitchell@email.com">sarah.mitchell@email.com</a></div>
+      <div>+1 (555) 876-4321</div>
+      <div><a href="https://linkedin.com/in/sarahmitchell">linkedin.com/in/sarahmitchell</a></div>
+      <div><a href="https://sarahmitchell.design">sarahmitchell.design</a></div>
+      <div>Austin, TX</div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <section class="section">
+      <div class="section-title">Contact</div>
+      <div class="contact-item">
+        <span class="contact-label">Email</span>
+        <span class="contact-value"><a href="mailto:sarah.mitchell@email.com">sarah.mitchell@email.com</a></span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-label">Phone</span>
+        <span class="contact-value">+1 (555) 876-4321</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-label">LinkedIn</span>
+        <span class="contact-value"><a href="#">linkedin.com/in/sarahmitchell</a></span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-label">Portfolio</span>
+        <span class="contact-value"><a href="#">sarahmitchell.design</a></span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-label">Location</span>
+        <span class="contact-value">Austin, TX</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">Skills</div>
+      <div class="skill-category">
+        <div class="skill-category-name">Design Tools</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Figma</span>
+          <span class="skill-tag">Sketch</span>
+          <span class="skill-tag">Adobe XD</span>
+          <span class="skill-tag">InVision</span>
+          <span class="skill-tag">Zeplin</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-category-name">Research</div>
+        <div class="skill-tags">
+          <span class="skill-tag">User Interviews</span>
+          <span class="skill-tag">Usability Testing</span>
+          <span class="skill-tag">A/B Testing</span>
+          <span class="skill-tag">Heuristic Analysis</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-category-name">Prototyping</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Wireframing</span>
+          <span class="skill-tag">High-Fidelity</span>
+          <span class="skill-tag">Motion Design</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-category-name">Frontend (Basic)</div>
+        <div class="skill-tags">
+          <span class="skill-tag">HTML</span>
+          <span class="skill-tag">CSS</span>
+          <span class="skill-tag">React (basics)</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-category-name">Methods</div>
+        <div class="skill-tags">
+          <span class="skill-tag">Design Thinking</span>
+          <span class="skill-tag">Agile</span>
+          <span class="skill-tag">Design Systems</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">Education</div>
+      <div class="edu-entry">
+        <div class="edu-degree">B.F.A. Interaction Design</div>
+        <div class="edu-school">Carnegie Mellon University</div>
+        <div class="edu-date">May 2016 | GPA: 3.8/4.0</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">Certifications</div>
+      <div class="cert-item">NN/g UX Certified (2023)</div>
+      <div class="cert-item">Google UX Design Certificate (2022)</div>
+      <div class="cert-item">Interaction Design Foundation (2021)</div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">Languages</div>
+      <div class="cert-item">English — Native</div>
+      <div class="cert-item">Spanish — Professional</div>
+      <div class="cert-item">French — Conversational</div>
+    </section>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <section class="section summary">
+      <div class="section-title">Professional Summary</div>
+      <p>Strategic UX Designer with 8+ years of experience creating human-centered digital products across fintech, healthcare, and e-commerce sectors. Expert in full-cycle design processes from discovery research to high-fidelity prototypes and usability validation. Led design for products used by 10M+ users globally. Passionate about building accessible, inclusive experiences backed by data.</p>
+    </section>
+
+    <section class="section">
+      <div class="section-title">Professional Experience</div>
+
+      <div class="entry">
+        <div class="entry-header">
+          <span class="entry-title">Lead Product Designer</span>
+          <span class="entry-date">Mar 2021 – Present</span>
+        </div>
+        <div class="entry-sub">Robinhood — Menlo Park, CA</div>
+        <ul>
+          <li>Redesigned the options trading flow for 5M+ users, increasing task completion rate from 61% to 89% through iterative usability testing and simplified information hierarchy.</li>
+          <li>Built and maintained a unified design system (300+ components) adopted by 18 product squads, reducing design-to-dev handoff time by 55%.</li>
+          <li>Managed 3 junior designers, establishing a weekly design critique process and structured onboarding that shortened ramp-up time by 3 weeks.</li>
+          <li>Partnered with data science team to instrument Mixpanel funnels; identified a checkout drop-off saving $4M ARR after fix.</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="entry-header">
+          <span class="entry-title">Senior UX Designer</span>
+          <span class="entry-date">Aug 2018 – Feb 2021</span>
+        </div>
+        <div class="entry-sub">Oscar Health — New York, NY</div>
+        <ul>
+          <li>Led end-to-end UX for Oscar's member portal serving 500K+ members, improving NPS score by 18 points post-redesign.</li>
+          <li>Conducted 40+ user interviews and synthesized findings into actionable design briefs that directly shaped the product roadmap.</li>
+          <li>Advocated for and implemented WCAG 2.1 AA accessibility standards across all patient-facing surfaces.</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="entry-header">
+          <span class="entry-title">UX Designer</span>
+          <span class="entry-date">Jul 2016 – Jul 2018</span>
+        </div>
+        <div class="entry-sub">Razorfish — New York, NY</div>
+        <ul>
+          <li>Delivered UX for Fortune 500 clients including Coca-Cola and FedEx, shipping 8 digital products over 2 years.</li>
+          <li>Facilitated design sprints and stakeholder workshops that aligned cross-functional teams on user priorities.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">Selected Projects</div>
+      <div class="project">
+        <div class="project-name">Clarity Design System — Open Source</div>
+        <div class="project-desc">Created and maintains a comprehensive open-source design system with Figma and React components. 2,100+ GitHub stars, used by 35+ companies. Featured in Figma's Community showcase.</div>
+      </div>
+      <div class="project">
+        <div class="project-name">HealthBridge Patient App — Freelance</div>
+        <div class="project-desc">Designed end-to-end UX for a telehealth app connecting rural patients with specialists. App achieved 4.8★ App Store rating and won the SXSW Health Innovation Award 2023.</div>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+</body>
+</html>

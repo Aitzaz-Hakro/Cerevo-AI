@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aitzaz Hassan — Front End Developer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Source+Sans+3:wght@300;400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 10.5pt;
+    color: #1a1a1a;
+    background: #fff;
+    line-height: 1.45;
+  }
+
+  .page {
+    width: 794px;
+    min-height: 1123px;
+    margin: 0 auto;
+    padding: 46px 54px;
+    background: #fff;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    margin-bottom: 16px;
+    padding-bottom: 13px;
+    border-bottom: 2px solid #1a1a1a;
+  }
+
+  .header h1 {
+    font-family: 'Merriweather', serif;
+    font-size: 25pt;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: #0f0f0f;
+    margin-bottom: 3px;
+  }
+
+  .header .title {
+    font-size: 10.5pt;
+    font-weight: 600;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 9px;
+  }
+
+  .contact-line {
+    font-size: 9.5pt;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 3px 10px;
+    align-items: center;
+  }
+
+  .contact-line a { color: #1a1a1a; text-decoration: none; }
+  .contact-line a:hover { text-decoration: underline; }
+  .contact-line .sep { color: #aaa; font-size: 9pt; }
+
+  /* ── SECTIONS ── */
+  .section { margin-bottom: 15px; }
+
+  .section-title {
+    font-family: 'Merriweather', serif;
+    font-size: 10.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #0f0f0f;
+    border-bottom: 1px solid #1a1a1a;
+    padding-bottom: 3px;
+    margin-bottom: 10px;
+  }
+
+  /* ── SUMMARY ── */
+  .summary p {
+    font-size: 10pt;
+    color: #2d2d2d;
+    line-height: 1.6;
+  }
+
+  /* ── EXPERIENCE ── */
+  .entry { margin-bottom: 12px; }
+  .entry:last-child { margin-bottom: 0; }
+
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .entry-title {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #0f0f0f;
+  }
+
+  .entry-date {
+    font-size: 9.5pt;
+    color: #555;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .entry-sub {
+    font-size: 10pt;
+    color: #444;
+    font-weight: 600;
+    margin-top: 1px;
+    margin-bottom: 5px;
+  }
+
+  .entry ul {
+    padding-left: 17px;
+    list-style: disc;
+  }
+
+  .entry ul li {
+    font-size: 10pt;
+    color: #2d2d2d;
+    margin-bottom: 3px;
+    line-height: 1.5;
+  }
+
+  /* ── SKILLS ── */
+  .skills-block { display: flex; flex-direction: column; gap: 5px; }
+
+  .skill-row {
+    display: flex;
+    gap: 6px;
+    font-size: 10pt;
+    line-height: 1.5;
+  }
+
+  .skill-label {
+    font-weight: 700;
+    color: #0f0f0f;
+    flex-shrink: 0;
+    min-width: 130px;
+  }
+
+  .skill-value { color: #2d2d2d; }
+
+  /* ── PROJECTS ── */
+  .project { margin-bottom: 10px; }
+  .project:last-child { margin-bottom: 0; }
+
+  .project-name {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #0f0f0f;
+    margin-bottom: 2px;
+  }
+
+  .project-desc {
+    font-size: 10pt;
+    color: #2d2d2d;
+    line-height: 1.55;
+  }
+
+  /* ── EDUCATION ── */
+  .edu-entry { }
+  .edu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .edu-degree {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #0f0f0f;
+  }
+  .edu-date {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #555;
+    white-space: nowrap;
+  }
+  .edu-school {
+    font-size: 10pt;
+    color: #444;
+    font-weight: 600;
+    margin-top: 1px;
+  }
+
+  @media print {
+    body { margin: 0; }
+    .page { margin: 0; padding: 38px 44px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <h1>Aitzaz Hassan</h1>
+    <div class="title">Front End Developer</div>
+    <div class="contact-line">
+      <a href="mailto:aitzazhakro123@gmail.com">aitzazhakro123@gmail.com</a>
+      <span class="sep">|</span>
+      <span>+923043005127</span>
+      <span class="sep">|</span>
+      <a href="https://linkedin.com/in/aitzaz-hassan" target="_blank">Aitzaz Hassan</a>
+      <span class="sep">|</span>
+      <a href="https://github.com/aitzaz-hakro" target="_blank">Aitzaz-Hakro</a>
+      <span class="sep">|</span>
+      <span>Hyderabad, Sindh</span>
+    </div>
+  </header>
+
+  <!-- SUMMARY -->
+  <section class="section summary">
+    <div class="section-title">Summary</div>
+    <p>Front End Developer passionate about building scalable, user-focused web solutions that enhance performance and business value. Skilled in Next.js, TypeScript, Tailwind, and Prisma, with a focus on clean architecture and seamless user experience. Committed to crafting reliable systems and web solutions.</p>
+  </section>
+
+  <!-- EDUCATION -->
+  <section class="section">
+    <div class="section-title">Education</div>
+    <div class="edu-entry">
+      <div class="edu-header">
+        <span class="edu-degree">Computer Systems Engineering</span>
+        <span class="edu-date">08/2027 | Jamshoro, Sindh</span>
+      </div>
+      <div class="edu-school">Mehran University of Engineering &amp; Technology, Jamshoro</div>
+    </div>
+  </section>
+
+  <!-- WORK EXPERIENCE -->
+  <section class="section">
+    <div class="section-title">Work Experience</div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <span class="entry-title">Front End Developer</span>
+        <span class="entry-date">06/2025 – 10/2025</span>
+      </div>
+      <div class="entry-sub">IRIS Software Solutions — Hyderabad, Pakistan</div>
+      <ul>
+        <li>Developed and revamped websites for security and taxi services, including a WordPress to HTML conversion and a Next.js project that increased sales by 10%.</li>
+        <li>Collaborated with the team to optimize performance, improve user experience, and ensure responsive, visually appealing designs.</li>
+        <li>Applied strong coding and problem-solving skills to enhance functionality while gaining hands-on corporate and industry exposure.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="section">
+    <div class="section-title">Skills</div>
+    <div class="skills-block">
+      <div class="skill-row">
+        <span class="skill-label">Technical Skills:</span>
+        <span class="skill-value">Next.js, JavaScript, TypeScript, HTML, CSS3, Bootstrap, Tailwind CSS, Shadcn, PHP, NextAuth, Prisma, EmailJS, MySQL, PostgreSQL, Git, GitHub, Supabase, XAMPP, phpMyAdmin, SQL Workbench</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Interpersonal Skills:</span>
+        <span class="skill-value">Communication Skills, Project Management, Problem Solving, Time Management, Public Speaking, Leadership</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="section">
+    <div class="section-title">Projects</div>
+
+    <div class="project">
+      <div class="project-name">Brit Cars Website</div>
+      <div class="project-desc">Developed a modern, SEO-optimized website for Brit Cars Ltd, resulting in a significant rise in online bookings and stronger customer engagement through improved site performance and streamlined booking flow.</div>
+    </div>
+
+    <div class="project">
+      <div class="project-name">NCRAAI Website</div>
+      <div class="project-desc">Rebuilt the NCRAAI research center website from scratch, improving site performance, design consistency, and user experience, and increasing their online presence and engagement by 30%.</div>
+    </div>
+
+    <div class="project">
+      <div class="project-name">TeamK9 Website</div>
+      <div class="project-desc">Revamped the online platform of a security services provider, enhancing brand credibility, client engagement, and lead generation through a refined design and user-centered experience.</div>
+    </div>
+
+    <div class="project">
+      <div class="project-name">Hult Prize MUET Website</div>
+      <div class="project-desc">Developed an interactive website for the Hult Prize MUET program, enabling 100+ event registrations and centralized updates for over 700+ students. The platform improved visibility and streamlined campus participation compared to their previous social media–only presence.</div>
+    </div>
+
+  </section>
+
+</div>
+</body>
+</html>
