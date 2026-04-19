@@ -3,12 +3,13 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
-import { Target, Zap, BookOpen, Home, Briefcase } from "lucide-react"
+import { Target, Zap, BookOpen, Home, Briefcase, MessageSquare } from "lucide-react"
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/ats-checker", label: "ATS Checker", icon: Zap },
   { href: "/job-matcher", label: "Job Matcher", icon: Target },
+  { href: "/interview", label: "Interview Prep", icon: MessageSquare },
   { href: "/portfolio-builder", label: "Portfolio Builder", icon: Briefcase },
   { href: "/resume-builder", label: "Resume Builder", icon: BookOpen },
 ]
