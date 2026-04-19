@@ -15,6 +15,29 @@ export function ExperienceSection({ section }: Props) {
 
   const { entries } = section.data;
 
+  const addEntry = () => {
+    const newEntry: ExperienceEntry = {
+      id: crypto.randomUUID(),
+      jobTitle: 'Job Title',
+      company: 'Company Name',
+      location: 'City',
+      startDate: 'Month Year',
+      endDate: 'Present',
+      bullets: ['Describe your key achievement here.'],
+    };
+    updateSectionData(section.id, {
+      type: 'experience',
+      entries: [...entries, newEntry],
+    });
+  };
+
+  const removeEntry = (entryId: string) => {
+    updateSectionData(section.id, {
+      type: 'experience',
+      entries: entries.filter((e) => e.id !== entryId),
+    });
+  };
+
   const updateEntry = (
     entryId: string,
     field: keyof ExperienceEntry,
@@ -58,7 +81,14 @@ export function ExperienceSection({ section }: Props) {
     <div>
       <SectionTitle>Work Experience</SectionTitle>
       {entries.map((entry) => (
-        <div key={entry.id} style={{ marginBottom: '12px' }}>
+        <div key={entry.id} className="group relative" style={{ marginBottom: '12px' }}>
+          <button
+            onClick={() => removeEntry(entry.id)}
+            className="absolute -right-5 -top-1 text-gray-300 hover:text-red-500 text-xs opacity-0 group-hover:opacity-100"
+            title="Remove experience"
+          >
+            x
+          </button>
           <div
             style={{
               display: 'flex',
@@ -131,6 +161,12 @@ export function ExperienceSection({ section }: Props) {
           </button>
         </div>
       ))}
+      <button
+        onClick={addEntry}
+        className="text-[9pt] text-blue-400 hover:text-blue-600 mt-2 flex items-center gap-1"
+      >
+        <span>+</span> Add Experience
+      </button>
     </div>
   );
 }

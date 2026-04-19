@@ -1,80 +1,85 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useResumeStore } from '@/store/resume-store';
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { SortableSection } from './SortableSection';
-import { renderSection } from './sections';
+import { TemplateRenderer } from './templates/TemplateRenderer';
+import { RichTextToolbar } from './RichTextToolbar';
+
+const A4_HEIGHT_PX = 1123;
+const A4_WIDTH_PX = 794;
 
 export function ResumeCanvas() {
-  const sections = useResumeStore((s) => s.resume.sections);
-  const visibleSections = useMemo(
-    () =>
-      [...sections]
-        .filter((section) => section.visible)
-        .sort((a, b) => a.order - b.order),
-    [sections]
-  );
-  const reorderSections = useResumeStore((s) => s.reorderSections);
+  const resume = useResumeStore((s) => s.resume);
+  const paperRef = useRef<HTMLDivElement>(null);
+  const [pageCount, setPageCount] = useState(1);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 },
-    })
-  );
+  useEffect(() => {
+    if (!paperRef.current) return;
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIndex = visibleSections.findIndex((section) => section.id === active.id);
-    const newIndex = visibleSections.findIndex((section) => section.id === over.id);
-    if (oldIndex !== -1 && newIndex !== -1) {
-      reorderSections(oldIndex, newIndex);
-    }
-  };
+    const observer = new ResizeObserver(() => {
+      const height = paperRef.current?.scrollHeight ?? 0;
+      setPageCount(Math.max(1, Math.ceil(height / A4_HEIGHT_PX)));
+    });
+
+    observer.observe(paperRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#e8e8e8] flex justify-center py-8 px-4">
+    <div
+      id="resume-canvas-scroll"
+      className="flex-1 overflow-y-auto bg-[#e8e8e8] py-8 px-4 relative"
+    >
+      <RichTextToolbar />
       <div
-        className="bg-white shadow-md"
-        style={{
-          width: '794px',
-          minHeight: '1123px',
-          padding: '48px 54px',
-          fontFamily: "'Georgia', serif",
-          fontSize: '10.5pt',
-          color: '#1a1a1a',
-          lineHeight: '1.45',
-          position: 'relative',
-        }}
+        className="relative mx-auto"
+        style={{ width: `${A4_WIDTH_PX}px` }}
       >
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+        <div
+          ref={paperRef}
+          className="bg-white shadow-md"
+          style={{
+            width: `${A4_WIDTH_PX}px`,
+            minHeight: `${A4_HEIGHT_PX}px`,
+            padding: '48px 54px',
+            position: 'relative',
+          }}
         >
-          <SortableContext
-            items={visibleSections.map((section) => section.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            {visibleSections.map((section) => (
-              <SortableSection key={section.id} section={section}>
-                {renderSection(section)}
-              </SortableSection>
-            ))}
-          </SortableContext>
-        </DndContext>
+          <TemplateRenderer resume={resume} />
+        </div>
+
+        {pageCount > 1 &&
+          Array.from({ length: pageCount - 1 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                top: `${(i + 1) * A4_HEIGHT_PX}px`,
+                left: 0,
+                right: 0,
+                height: '1px',
+                background: '#94a3b8',
+                zIndex: 10,
+                pointerEvents: 'none',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  top: '-10px',
+                  background: '#e8e8e8',
+                  padding: '0 8px',
+                  fontSize: '9px',
+                  color: '#94a3b8',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                - Page {i + 2} -
+              </div>
+            </div>
+          ))}
       </div>
     </div>
   );

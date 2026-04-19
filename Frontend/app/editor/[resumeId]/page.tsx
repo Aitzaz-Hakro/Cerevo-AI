@@ -1,4 +1,8 @@
-import { EditorShell } from '@/components/editor/EditorShell';
+import dynamic from 'next/dynamic';
+
+const EditorShell = dynamic(() => import('@/components/editor/EditorShell').then((m) => m.EditorShell), {
+  ssr: false,
+});
 
 interface Props {
   params: { resumeId: string };

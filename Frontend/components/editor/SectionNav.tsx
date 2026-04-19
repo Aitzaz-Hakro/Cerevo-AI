@@ -2,6 +2,12 @@
 
 import { useMemo } from 'react';
 import { useResumeStore } from '@/store/resume-store';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const SECTION_LABELS: Record<string, string> = {
   header: 'Header',
@@ -17,6 +23,12 @@ const SECTION_LABELS: Record<string, string> = {
 
 export function SectionNav() {
   const sections = useResumeStore((s) => s.resume.sections);
+  const addSection = useResumeStore((s) => s.addSection);
+
+  const AVAILABLE_SECTIONS = ['certifications', 'languages', 'custom'] as const;
+  const existingTypes = sections.map((s) => s.type);
+  const addable = AVAILABLE_SECTIONS.filter((t) => !existingTypes.includes(t));
+
   const sortedSections = useMemo(
     () => [...sections].sort((a, b) => a.order - b.order),
     [sections]
@@ -43,6 +55,27 @@ export function SectionNav() {
           {SECTION_LABELS[section.type] ?? section.type}
         </button>
       ))}
+
+      <div className="mt-2 px-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="text-[10px] text-gray-400 hover:text-gray-700 py-2 flex items-center gap-1">
+              <span>+</span> Add section
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {addable.length === 0 ? (
+              <DropdownMenuItem disabled>All optional sections added</DropdownMenuItem>
+            ) : (
+              addable.map((type) => (
+                <DropdownMenuItem key={type} onClick={() => addSection(type)}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </DropdownMenuItem>
+              ))
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 }

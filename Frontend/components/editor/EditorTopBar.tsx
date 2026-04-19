@@ -1,10 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { useResumeStore } from '@/store/resume-store';
 import { Button } from '@/components/ui/button';
+import { TemplateSwitcher } from './TemplateSwitcher';
 
 export function EditorTopBar() {
   const resume = useResumeStore((s) => s.resume);
+  const [showTemplateSwitcher, setShowTemplateSwitcher] = useState(false);
 
   const handleExport = async () => {
     const res = await fetch('/api/export-pdf', {
@@ -30,7 +33,12 @@ export function EditorTopBar() {
         <span className="text-xs text-gray-500">{resume.title}</span>
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" className="text-xs">
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs"
+          onClick={() => setShowTemplateSwitcher(true)}
+        >
           Change Template
         </Button>
         <Button variant="outline" size="sm" className="text-xs">
@@ -40,6 +48,10 @@ export function EditorTopBar() {
           Download PDF
         </Button>
       </div>
+      <TemplateSwitcher
+        open={showTemplateSwitcher}
+        onClose={() => setShowTemplateSwitcher(false)}
+      />
     </div>
   );
 }

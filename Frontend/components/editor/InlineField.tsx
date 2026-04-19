@@ -1,13 +1,14 @@
 'use client';
 
 import ContentEditable from 'react-contenteditable';
-import { KeyboardEvent, useEffect, useRef } from 'react';
+import { CSSProperties, KeyboardEvent, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface Props {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  style?: CSSProperties;
   placeholder?: string;
   tagName?: string;
   multiline?: boolean;
@@ -17,6 +18,7 @@ export function InlineField({
   value,
   onChange,
   className,
+  style,
   placeholder = 'Click to edit...',
   tagName = 'div',
   multiline = false,
@@ -24,13 +26,14 @@ export function InlineField({
   const ref = useRef(value);
 
   useEffect(() => {
-    ref.current = value;
+    if (value !== ref.current) {
+      ref.current = value;
+    }
   }, [value]);
 
   const handleChange = (e: { target: { value: string } }) => {
-    const raw = e.target.value.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
-    ref.current = raw;
-    onChange(raw);
+    ref.current = e.target.value;
+    onChange(e.target.value);
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -53,6 +56,7 @@ export function InlineField({
         'empty:before:content-[attr(data-placeholder)] empty:before:text-gray-300',
         className
       )}
+      style={style}
       data-placeholder={placeholder}
       suppressContentEditableWarning
     />
