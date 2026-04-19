@@ -3,14 +3,13 @@
 
 import React from "react";
 import Link from "next/link";
-import { FileText, Zap, BookOpen, Briefcase, Target } from "lucide-react";
+import { Zap, BookOpen, Briefcase, Target } from "lucide-react";
 
 const features = [
   { href: "/ats-checker", icon: Zap, title: "ATS Checker", description: "Ensure your resume passes modern Applicant Tracking Systems with actionable fixes." },
   { href: "/job-matcher", icon: Target, title: "Job Matcher", description: "Compare your resume against a job description and get a clear match breakdown." },
   { href: "/portfolio-builder", icon: Briefcase, title: "Portfolio Builder", description: "Generate a polished portfolio website to showcase your skills and projects." },
   { href: "/resume-builder", icon: BookOpen, title: "Resume Builder", description: "Create recruiter-ready resumes in minutes with AI-assisted writing support." },
-  { href: "/resume-analyzer", icon: FileText, title: "Resume Analyzer", description: "Upload your resume and get detailed AI insights to improve content and impact." },
 ];
 
 export default function Features() {
@@ -18,7 +17,7 @@ export default function Features() {
     <div id="features">
       <h2 className="text-3xl font-bold mb-8">Cerevo Services</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {features.map((f, i) => {
           const Icon = f.icon;
           return (

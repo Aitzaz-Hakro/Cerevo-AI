@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Moon, Sun, LogOut, User, FileText, Shield, Target, Briefcase, BookOpen } from "lucide-react"
+import { Menu, X, Moon, Sun, LogOut, User, Shield, Target, Briefcase, BookOpen } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/utils/supabase/client"
 import { signout } from "@/lib/auth-actions"
@@ -14,7 +14,6 @@ const navLinks = [
   { href: "/job-matcher", label: "Job Matcher", icon: Target },
   { href: "/portfolio-builder", label: "Portfolio Builder", icon: Briefcase },
   { href: "/resume-builder", label: "Resume Builder", icon: BookOpen },
-  { href: "/resume-analyzer", label: "Resume Analyzer", icon: FileText },
 ]
 
 export default function Header() {

@@ -555,7 +555,7 @@ export default function JobMatcherPage() {
                             Bridge your skill gaps
                           </h3>
                           <p className="text-sm text-muted-foreground">
-                            Sign up to unlock Resume Analyzer, ATS Checker, Resume Builder, and Portfolio Builder.
+                            Sign up to unlock ATS Checker, Resume Builder, and Portfolio Builder.
                           </p>
                         </div>
                         <Link
