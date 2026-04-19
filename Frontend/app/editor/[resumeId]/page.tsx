@@ -1,9 +1,9 @@
-import { EditorShellClient } from '@/components/editor/EditorShellClient';
+import { EditorShell } from '@/components/editor/EditorShell';
 
 interface Props {
   params: { resumeId: string };
 }
 
 export default function EditorPage({ params }: Props) {
-  return <EditorShellClient resumeId={params.resumeId} />;
+  return <EditorShell resumeId={params.resumeId} />;
 }
