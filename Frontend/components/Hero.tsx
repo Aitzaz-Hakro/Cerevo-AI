@@ -47,10 +47,9 @@ export default function Hero() {
               <StarBorder
                 as={Link}
                 href="/signup"
-                className="inline-flex items-center gap-2 shadow-lg shadow-primary/20"
+                className="flex items-center  shadow-lg shadow-primary/20"
               >
-                <span>Get Started for Free</span>
-                <ArrowRight size={16} />
+                <span className="flex gap-2">Get Started for Free  <ArrowRight size={16} className="mt-1" /> </span>
               </StarBorder>
 
               <Link

@@ -3,20 +3,44 @@ import { API_MAP, INTERPREP_BASE } from '@/lib/interview-api';
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { resumeText } = body as { resumeText?: string };
+    const requestFormData = await req.formData();
+    const cvFile = requestFormData.get('cv');
+    const resumeText = requestFormData.get('resume_text');
 
-    if (!resumeText?.trim()) {
-      return NextResponse.json({ error: 'Resume content is required' }, { status: 400 });
+    const file = cvFile instanceof File ? cvFile : null;
+    const text = typeof resumeText === 'string' ? resumeText.trim() : '';
+
+    if (!file && !text) {
+      return NextResponse.json({ error: 'Resume content is required.' }, { status: 400 });
+    }
+
+    if (file && file.size > 10 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: 'That file is too large. Please upload a CV under 10MB.' },
+        { status: 413 }
+      );
+    }
+
+    if (file) {
+      const validMime =
+        file.type === 'application/pdf' ||
+        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      const validExtension = /\.(pdf|docx)$/i.test(file.name);
+
+      if (!validMime && !validExtension) {
+        return NextResponse.json({ error: 'Please upload a PDF or DOCX file.' }, { status: 415 });
+      }
     }
 
     const payload = new FormData();
-    payload.append(
-      API_MAP.requestFields.resumeFile,
-      new Blob([resumeText], { type: 'text/plain' }),
-      'resume.txt'
-    );
-    payload.append(API_MAP.requestFields.resumeText, resumeText);
+
+    if (file) {
+      payload.append(API_MAP.requestFields.resumeFile, file, file.name);
+    }
+
+    if (text) {
+      payload.append(API_MAP.requestFields.resumeText, text);
+    }
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 60000);
@@ -44,12 +68,14 @@ export async function POST(req: NextRequest) {
     const data = (await response.json()) as Record<string, unknown>;
     const R = API_MAP.responseFields;
     const firstMessage =
-      data[R.firstMessage] ?? data.message ?? data.question ?? data.next_question ?? data.response;
+      data.question ?? data[R.firstMessage] ?? data.message ?? data.next_question ?? data.response;
 
     return NextResponse.json({
       sessionId: String(data[R.sessionId] ?? data.session_id ?? data.session ?? 'single-session'),
+      question: String(firstMessage ?? 'Tell me about yourself.'),
       firstMessage: String(firstMessage ?? 'Interview started.'),
       totalQuestions: Number(data[R.totalQuestions] ?? 10),
+      done: Boolean(data.done ?? data[R.isComplete] ?? false),
     });
   } catch (error) {
     if ((error as Error).name === 'AbortError') {

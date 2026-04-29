@@ -7,7 +7,7 @@ export const API_MAP = {
     endSession: () => '/answer',
   },
   requestFields: {
-    resumeFile: 'file',
+    resumeFile: 'cv',
     resumeText: 'resume_text',
     message: 'answer',
     answer: 'answer',
@@ -15,11 +15,11 @@ export const API_MAP = {
   },
   responseFields: {
     sessionId: 'session_id',
-    firstMessage: 'first_question',
+    firstMessage: 'question',
     totalQuestions: 'total_questions',
-    message: 'next_question',
+    message: 'question',
     questionNumber: 'question_number',
-    isComplete: 'is_complete',
+    isComplete: 'done',
     feedback: 'feedback',
     summary: 'summary',
     score: 'score',
@@ -28,13 +28,33 @@ export const API_MAP = {
   },
 } as const;
 
-export async function createInterviewSession(data: {
-  resumeText: string;
-}): Promise<{ sessionId: string; firstMessage: string; totalQuestions: number }> {
+export async function createInterviewSession(
+  data: {
+    file?: File;
+    resumeText?: string;
+  },
+  options?: { signal?: AbortSignal }
+): Promise<{
+  sessionId: string;
+  question?: string;
+  firstMessage?: string;
+  totalQuestions: number;
+  done?: boolean;
+}> {
+  const payload = new FormData();
+
+  if (data.file) {
+    payload.append(API_MAP.requestFields.resumeFile, data.file);
+  }
+
+  if (data.resumeText?.trim()) {
+    payload.append(API_MAP.requestFields.resumeText, data.resumeText.trim());
+  }
+
   const res = await fetch('/api/interview/session', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: payload,
+    signal: options?.signal,
   });
 
   if (!res.ok) {
@@ -45,24 +65,37 @@ export async function createInterviewSession(data: {
   return res.json();
 }
 
-export async function sendMessage(data: {
-  sessionId?: string;
-  message: string;
-}): Promise<{
-  message: string;
-  questionNumber: number;
-  totalQuestions: number;
-  isComplete: boolean;
+export async function sendMessage(
+  data: {
+    sessionId?: string;
+    message?: string;
+    answer?: string;
+  },
+  options?: { signal?: AbortSignal }
+): Promise<{
+  question?: string;
+  message?: string;
+  questionNumber?: number;
+  totalQuestions?: number;
+  done?: boolean;
+  isComplete?: boolean;
   feedback?: string;
   summary?: string;
   score?: number;
   strengths?: string[];
   improvements?: string[];
 }> {
+  const answer = data.answer ?? data.message ?? '';
+
   const res = await fetch('/api/interview/message', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      sessionId: data.sessionId,
+      answer,
+      message: answer,
+    }),
+    signal: options?.signal,
   });
 
   if (!res.ok) {

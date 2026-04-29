@@ -4,14 +4,19 @@ import { API_MAP, INTERPREP_BASE } from '@/lib/interview-api';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { sessionId, message } = body as { sessionId?: string; message?: string };
+    const { sessionId, message, answer } = body as {
+      sessionId?: string;
+      message?: string;
+      answer?: string;
+    };
+    const normalizedAnswer = answer?.trim() || message?.trim() || '';
 
-    if (!message?.trim()) {
+    if (!normalizedAnswer) {
       return NextResponse.json({ error: 'message is required' }, { status: 400 });
     }
 
     const payload: Record<string, string> = {
-      [API_MAP.requestFields.answer]: message,
+      [API_MAP.requestFields.answer]: normalizedAnswer,
     };
 
     if (sessionId?.trim()) {
@@ -45,18 +50,20 @@ export async function POST(req: NextRequest) {
     const data = (await response.json()) as Record<string, unknown>;
     const R = API_MAP.responseFields;
     const normalizedMessage =
-      data[R.message] ?? data.message ?? data.next_question ?? data.question ?? data.response;
+      data.question ?? data[R.message] ?? data.message ?? data.next_question ?? data.response;
     const completeFlag =
-      data[R.isComplete] ?? data.is_finished ?? data.completed ?? data.done ?? false;
+      data.done ?? data[R.isComplete] ?? data.is_finished ?? data.completed ?? false;
     const toNumber = (value: unknown, fallback: number) => {
       const parsed = Number(value);
       return Number.isFinite(parsed) ? parsed : fallback;
     };
 
     return NextResponse.json({
+      question: String(normalizedMessage ?? ''),
       message: String(normalizedMessage ?? ''),
       questionNumber: toNumber(data[R.questionNumber] ?? data.current_question ?? 1, 1),
       totalQuestions: toNumber(data[R.totalQuestions] ?? data.total ?? 10, 10),
+      done: Boolean(completeFlag),
       isComplete: Boolean(completeFlag),
       feedback: data[R.feedback] ? String(data[R.feedback]) : undefined,
       summary: data[R.summary] ? String(data[R.summary]) : undefined,
